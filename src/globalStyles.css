@@ -1,3 +1,46 @@
+@font-face {
+    font-family: 'AlbulaLight';
+    src: url('/fonts/albula/Albula-Light.ttf') format('truetype');
+    font-style: normal;
+}
+  
+@font-face {
+    font-family: 'AlbulaRegular';
+    src: url('/fonts/albula/Albula-Regular.ttf') format('truetype');
+    font-style: normal;
+}
+  
+@font-face {
+    font-family: 'AlbulaMedium';
+    src: url('/fonts/albula/Albula-Medium.ttf') format('truetype');
+    font-style: normal;
+}
+  
+@font-face {
+    font-family: 'AlbulaSemiBold';
+    src: url('/fonts/albula/Albula-SemiBold.ttf') format('truetype');
+    font-style: normal;
+}
+  
+@font-face {
+    font-family: 'AlbulaBold';
+    src: url('/fonts/albula/Albula-Bold.ttf') format('truetype');
+    font-style: normal;
+}
+  
+@font-face {
+    font-family: 'AlbulaExtraBold';
+    src: url('/fonts/albula/Albula-ExtraBold.ttf') format('truetype');
+    font-style: normal;
+}
+  
+@font-face {
+    font-family: 'AlbulaHeavy';
+    src: url('/fonts/albula/Albula-Heavy.ttf') format('truetype');
+    font-style: normal;
+}
+  
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

@@ -8223,12 +8223,13 @@
     "5777": {
       "events": {},
       "links": {},
-      "address": "0xf1Ba1B261EDaC975a0397C09ce8640fD06802e69",
-      "transactionHash": "0xfd5bb26e29c63ac7a4c90148daa0459f6df3a5fc5811112058c53be3a80273a8"
+      "address": "0x7CF3eAc165ec6039432e23E90DeD16D48a17942A",
+      "transactionHash": "0x01bf7b250dfbb59907a046f6f7310312de6e076fa3783ca7e5f909649aa7f719"
     }
   },
   "schemaVersion": "3.4.16",
-  "updatedAt": "2024-12-24T14:31:31.972Z",
+  "updatedAt": "2024-12-24T14:38:01.904Z",
+  "networkType": "ethereum",
   "devdoc": {
     "methods": {}
   },

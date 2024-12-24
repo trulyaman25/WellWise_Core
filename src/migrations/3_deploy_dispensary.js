@@ -1,4 +1,4 @@
-const DispensaryRegistry = artifacts.require("DispensaryRegistration");
+const DiagnosticRegistry = artifacts.require("DiagnosticRegistration");
 module.exports = function(deployer) {
-  	deployer.deploy(DispensaryRegistry);
+  deployer.deploy(DiagnosticRegistry);
 };

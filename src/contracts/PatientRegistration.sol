@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.19;
+pragma solidity ^0.5.16;
 
 contract PatientRegistration {
     struct Patient {
@@ -11,14 +11,15 @@ contract PatientRegistration {
         string password;
     }
 
-    struct PatientList{
+    struct PatientList {
         string patient_number;
         string patient_name;
     }
 
     mapping(string => bool) public isPatientRegistered;
     mapping(string => Patient) public patients;
-    mapping(string => PatientList[]) private Dpermission;
+    mapping(string => mapping(uint256 => PatientList)) private Dpermission;
+    mapping(string => uint256) private doctorPatientCount; // To track the number of patients per doctor
     mapping(string => mapping(string => bool)) public doctorPermissions;
 
     event PatientRegistered(string healthID, string name, address cryptoWalletAddress);
@@ -30,16 +31,15 @@ contract PatientRegistration {
         string memory _email,
         string memory _healthID,
         string memory _password
-
-    ) external {
+    ) public {
         require(!isPatientRegistered[_healthID], "Patient already registered");
 
         Patient memory newPatient = Patient({
             cryptoWalletAddress: _cryptoWalletAddress,
             name: _name,
             gender: _gender,
-            email: _email,    
-            healthID: _healthID,        
+            email: _email,
+            healthID: _healthID,
             password: _password
         });
 
@@ -48,21 +48,20 @@ contract PatientRegistration {
         emit PatientRegistered(_healthID, _name, _cryptoWalletAddress);
     }
 
-    function isRegisteredPatient(string memory _healthID) external view returns (bool) {
+    function isRegisteredPatient(string memory _healthID) public view returns (bool) {
         return isPatientRegistered[_healthID];
     }
-    
-    // Add a function to validate patient's password
-    function validatePassword(string memory _healthID, string memory _password) external view returns (bool) {
+
+    function validatePassword(string memory _healthID, string memory _password) public view returns (bool) {
         require(isPatientRegistered[_healthID], "Patient not registered");
         return keccak256(abi.encodePacked(_password)) == keccak256(abi.encodePacked(patients[_healthID].password));
     }
 
-    function getPatientDetails(string memory _healthID) external view returns (
-    address cryptoWalletAddress,
-    string memory name,
-    string memory gender,
-    string memory email
+    function getPatientDetails(string memory _healthID) public view returns (
+        address cryptoWalletAddress,
+        string memory name,
+        string memory gender,
+        string memory email
     ) {
         require(isPatientRegistered[_healthID], "Patient not registered");
         Patient memory patient = patients[_healthID];
@@ -73,33 +72,34 @@ contract PatientRegistration {
         string memory _patientNumber,
         string memory _doctorNumber,
         string memory _patientName
-    ) external {
+    ) public {
         require(!doctorPermissions[_patientNumber][_doctorNumber], "View Access already given to the Doctor!");
-        // Check if the patient number already exists in the list
-        bool exists = false;
-        for (uint i = 0; i < Dpermission[_doctorNumber].length; i++) {
-            if (keccak256(abi.encodePacked(Dpermission[_doctorNumber][i].patient_number)) == keccak256(abi.encodePacked(_patientNumber))) {
-                exists = true;
-                break;
-            }
-        }
 
-        // If the patient number does not exist, add it to the list
-        if (!exists) {
-            PatientList memory newRecord = PatientList(
-                _patientNumber,
-                _patientName
-            );
-            Dpermission[_doctorNumber].push(newRecord);
-        }
+        // Track the patient for the doctor
+        uint256 patientCount = doctorPatientCount[_doctorNumber];
+        Dpermission[_doctorNumber][patientCount] = PatientList({
+            patient_number: _patientNumber,
+            patient_name: _patientName
+        });
+        doctorPatientCount[_doctorNumber]++;
+
         doctorPermissions[_patientNumber][_doctorNumber] = true;
     }
 
-    function isPermissionGranted(string memory _patientNumber,string memory _doctorNumber) external view returns (bool) {
+    function isPermissionGranted(string memory _patientNumber, string memory _doctorNumber) public view returns (bool) {
         return doctorPermissions[_patientNumber][_doctorNumber];
     }
 
-    function getPatientList(string memory _doctorNumber) public view returns (PatientList[] memory) {
-        return Dpermission[_doctorNumber];
+    function getPatientList(string memory _doctorNumber) public view returns (string memory, string memory) {
+        uint256 patientCount = doctorPatientCount[_doctorNumber];
+        
+        // Return a single patient or return just the first entry to avoid complexity
+        if (patientCount > 0) {
+            PatientList memory patient = Dpermission[_doctorNumber][0];  // Change index as needed
+            return (patient.patient_number, patient.patient_name);
+        }
+        
+        // If no patient, return an empty string
+        return ("", "");
     }
 }

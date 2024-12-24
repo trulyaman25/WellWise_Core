@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import PatientRegistration from "../../../build/contracts/PatientRegistration.json";
 import Web3 from 'web3';
 
 const PatientForm = ({ patientData, handleInputChange, toggleDropdown, isGenderDropdownOpen, handleSelectGender, selectedGender }) => (

@@ -28,11 +28,11 @@ contract DoctorRegistration {
 
     function registerDoctor(
         string memory _doctorName,
-        string memory _hospitalName,
         string memory _gender,
-        string memory _email,
-        string memory _licenseNumber,
+        string memory _hospitalName,
         string memory _specialization,
+        string memory _licenseNumber,
+        string memory _email,
         string memory _password
     ) public {
         require(doctorAddresses[_licenseNumber] == address(0), "Doctor already registered");
@@ -40,11 +40,11 @@ contract DoctorRegistration {
         Doctor memory newDoctor = Doctor({
             cryptoWalletAddress: msg.sender,
             doctorName: _doctorName,
-            hospitalName: _hospitalName,
             gender: _gender,
-            email: _email,
-            licenseNumber: _licenseNumber,
+            hospitalName: _hospitalName,
             specialization: _specialization,
+            licenseNumber: _licenseNumber,
+            email: _email,
             password: _password
         });
 

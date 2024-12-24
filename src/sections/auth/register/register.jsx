@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import PatientRegistration from "../../../build/contracts/PatientRegistration.json";
+import DoctorRegistration from "../../../build/contracts/DoctorRegistration.json";
 import Web3 from 'web3';
+import { useNavigate } from 'react-router-dom';
 
 const PatientForm = ({ patientData, handleInputChange, toggleDropdown, isGenderDropdownOpen, handleSelectGender, selectedGender }) => (
     <>
@@ -277,6 +279,8 @@ const DispensaryForm = ({ dispensaryData, handleInputChange }) => (
 export default function Register() {
     const [userType, setUserType] = useState('patient');
 
+    const navigate = useNavigate();
+
     const [patientData, setPatientData] = useState({
         cryptoWalletAddress: '',
         fullName: '',
@@ -372,7 +376,6 @@ export default function Register() {
                     setAvailableAccounts(accounts);
 
                     const networkId = await web3Instance.eth.net.getId();
-                    console.log("Network ID:", networkId);
 
                     const deployedNetwork = PatientRegistration.networks[networkId];
                     const contractInstance = new web3Instance.eth.Contract(
@@ -429,9 +432,8 @@ export default function Register() {
                 )
                 .send({ from: patientData.cryptoWalletAddress });
     
-            alert("Patient registered successfully!");
             console.log("Patient registration successful");
-    
+            navigate("/login");
         } catch (error) {
             console.error("Error:", error);
             alert("An error occurred while registering the doctor.");
@@ -443,10 +445,49 @@ export default function Register() {
         e.preventDefault();
         try {
             console.log("Starting doctor registration process...");
+    
+            const web3 = new Web3(window.ethereum);
+            const networkId = await web3.eth.net.getId();
+            const contract = new web3.eth.Contract(
+                DoctorRegistration.abi,
+                DoctorRegistration.networks[networkId].address
+            );
+    
+            console.log("Checking if doctor is already registered...");
+    
+            const isRegDoc = await contract.methods
+                .isRegisteredDoctor(doctorData.cryptoWalletAddress)
+                .call();
+            console.log("Is Registered Doctor:", isRegDoc);
+    
+            if (isRegDoc) {
+                alert("Doctor already exists");
+                console.log("Doctor already exists, aborting registration");
+                return;
+            }
+    
+            console.log("Registering doctor with the following details:", doctorData);
+    
+            await contract.methods
+                .registerDoctor(
+                    doctorData.fullName,
+                    doctorData.gender,
+                    doctorData.hospitalName,
+                    doctorData.specialization,
+                    doctorData.licenseNumber,
+                    doctorData.email,
+                    doctorData.password
+                )
+                .send({ from: doctorData.cryptoWalletAddress });
+    
+            console.log("Doctor registration successful");
+            navigate("/login");
         } catch (error) {
-
+            console.error("Error during doctor registration:", error);
+            alert("An error occurred while registering the doctor.");
         }
     };
+    
 
     const handleDispensarySubmit = async (e) => {
         e.preventDefault();
@@ -457,7 +498,6 @@ export default function Register() {
         }
     };
     
-
     return (
         <div className="h-screen w-screen bg-gray-50 p-4 md:p-8 flex items-center justify-center">
             <div className="w-full lg:w-1/2 p-8 lg:p-12 flex flex-col justify-center">

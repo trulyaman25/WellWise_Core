@@ -19,7 +19,7 @@ contract PatientRegistration {
     mapping(string => bool) public isPatientRegistered;
     mapping(string => Patient) public patients;
     mapping(string => mapping(uint256 => PatientList)) private Dpermission;
-    mapping(string => uint256) private doctorPatientCount; // To track the number of patients per doctor
+    mapping(string => uint256) private doctorPatientCount;
     mapping(string => mapping(string => bool)) public doctorPermissions;
 
     event PatientRegistered(string healthID, string name, address cryptoWalletAddress);

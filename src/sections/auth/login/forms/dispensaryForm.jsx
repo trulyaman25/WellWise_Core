@@ -15,7 +15,8 @@ function DispensaryLogin({ setIsRegistered, setDispensaryDetails }) {
         const dispensaryPassword = dispensaryCredentials.password;
 
         try {
-            console.log("Starting the dispensary login process...");
+            console.log(`Starting login for Business License Number: ${dispensaryLicenceNumber}`);
+
             const web3 = new Web3(window.ethereum);
             const networkId = await web3.eth.net.getId();
             const deployedNetwork = DispensaryRegistration.networks[networkId];
@@ -24,30 +25,39 @@ function DispensaryLogin({ setIsRegistered, setDispensaryDetails }) {
                 deployedNetwork && deployedNetwork.address
             );
 
+            console.log("Checking if dispensary is registered...");
             const isRegisteredResult = await contract.methods
                 .isRegisteredDiagnostic(dispensaryLicenceNumber)
                 .call();
+            console.log("Is Registered:", isRegisteredResult);
+
             setIsRegistered(isRegisteredResult);
 
             if (isRegisteredResult) {
+                console.log("Dispensary is registered, validating password...");
                 const isValidPassword = await contract.methods
                     .validatePassword(dispensaryLicenceNumber, dispensaryPassword)
                     .call();
+                console.log("Is Valid Password:", isValidPassword);
 
                 if (isValidPassword) {
-                    const diagnostic = await contract.methods
+                    const fetchDispensaryDetails = await contract.methods
                         .getDiagnosticDetails(dispensaryLicenceNumber)
                         .call();
-                    setDispensaryDetails(diagnostic);
-                    console.log('Logged In');
+
+                    setDispensaryDetails(fetchDispensaryDetails);
+                    console.log("Dispensary details:", fetchDispensaryDetails);
+                    console.log('Login successful');
                 } else {
+                    console.log("Password validation failed");
                     alert("Incorrect password");
                 }
             } else {
-                alert("Dispensary not registered");
+                console.log("Dispensary not registered");
+                alert("Diagnostic not registered");
             }
         } catch (error) {
-            console.error("Error during dispensary login process:", error);
+            console.error("Error during login process:", error);
             alert("An error occurred while checking registration.");
         }
     };
@@ -69,7 +79,7 @@ function DispensaryLogin({ setIsRegistered, setDispensaryDetails }) {
                     value={dispensaryCredentials.licenseNumber}
                     onChange={handleInputChange}
                     placeholder="Business License Number"
-                    className="w-full pl-14 pr-6 py-3 rounded-full bg-gray-100 border-0 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
+                    className="w-full px-7 py-3 rounded-full bg-gray-100 border-0 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
                 />
             </div>
 
@@ -80,7 +90,7 @@ function DispensaryLogin({ setIsRegistered, setDispensaryDetails }) {
                     value={dispensaryCredentials.password}
                     onChange={handleInputChange}
                     placeholder="Password"
-                    className="w-full pl-14 pr-6 py-3 rounded-full bg-gray-100 border-0 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
+                    className="w-full px-7 py-3 rounded-full bg-gray-100 border-0 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
                 />
             </div>
 

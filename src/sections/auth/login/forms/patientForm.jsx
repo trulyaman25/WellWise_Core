@@ -15,7 +15,8 @@ function PatientLogin({ setIsRegistered, setPatientDetails }) {
         const patientPassword = patientCredentials.password;
 
         try {
-            console.log("Starting the Login process...");
+            console.log(`Starting login for Health ID: ${patientHealthID}`);
+
             const web3 = new Web3(window.ethereum);
             const networkId = await web3.eth.net.getId();
             const deployedNetwork = PatientRegistration.networks[networkId];
@@ -24,30 +25,37 @@ function PatientLogin({ setIsRegistered, setPatientDetails }) {
                 deployedNetwork && deployedNetwork.address
             );
 
+            console.log("Checking if patient is registered...");
             const isRegisteredResult = await contract.methods
                 .isRegisteredPatient(patientHealthID)
                 .call();
+            console.log("Is Registered:", isRegisteredResult);
+
             setIsRegistered(isRegisteredResult);
 
             if (isRegisteredResult) {
+                console.log("Patient is registered, validating password...");
                 const isValidPassword = await contract.methods
                     .validatePassword(patientHealthID, patientPassword)
                     .call();
+                console.log("Is Valid Password:", isValidPassword);
 
                 if (isValidPassword) {
                     const fetchPatientDetails = await contract.methods
                         .getPatientDetails(patientHealthID)
                         .call();
-                    setPatientDetails(fetchPatientDetails);
-                    console.log('Logged In');
+                    console.log("Patient details:", fetchPatientDetails);
+                    console.log('Login successful');
                 } else {
                     alert("Incorrect password");
+                    console.log("Password validation failed");
                 }
             } else {
                 alert("Patient not registered");
+                console.log("Patient not registered");
             }
         } catch (error) {
-            console.error("Error checking registration:", error);
+            console.error("Error during login process:", error);
             alert("An error occurred while checking registration.");
         }
     };
@@ -69,7 +77,7 @@ function PatientLogin({ setIsRegistered, setPatientDetails }) {
                     value={patientCredentials.healthID}
                     onChange={handleInputChange}
                     placeholder="National Health ID (ABHA ID)"
-                    className="w-full pl-14 pr-6 py-3 rounded-full bg-gray-100 border-0 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
+                    className="w-full px-7 py-3 rounded-full bg-gray-100 border-0 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
                 />
             </div>
 
@@ -80,7 +88,7 @@ function PatientLogin({ setIsRegistered, setPatientDetails }) {
                     value={patientCredentials.password}
                     onChange={handleInputChange}
                     placeholder="Password"
-                    className="w-full pl-14 pr-6 py-3 rounded-full bg-gray-100 border-0 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
+                    className="w-full px-7 py-3 rounded-full bg-gray-100 border-0 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
                 />
             </div>
 

@@ -15,7 +15,8 @@ function DoctorLogin({ setIsRegistered, setDoctorDetails }) {
         const doctorPassword = doctorCredentials.password;
 
         try {
-            console.log("Starting the doctor login process...");
+            console.log(`Starting login for Medical License Number: ${doctorLicenceNumber}`);
+
             const web3 = new Web3(window.ethereum);
             const networkId = await web3.eth.net.getId();
             const deployedNetwork = DoctorRegistration.networks[networkId];
@@ -24,33 +25,40 @@ function DoctorLogin({ setIsRegistered, setDoctorDetails }) {
                 deployedNetwork && deployedNetwork.address
             );
 
+            console.log("Checking if doctor is registered...");
             const isRegisteredResult = await contract.methods
                 .isRegisteredDoctor(doctorLicenceNumber)
                 .call();
+            console.log("Is Registered:", isRegisteredResult);
+
             setIsRegistered(isRegisteredResult);
 
             if (isRegisteredResult) {
+                console.log("Doctor is registered, validating password...");
                 const isValidPassword = await contract.methods
                     .validatePassword(doctorLicenceNumber, doctorPassword)
                     .call();
+                console.log("Is Valid Password:", isValidPassword);
 
                 if (isValidPassword) {
                     const fetchDoctorDetails = await contract.methods
                         .getDoctorDetails(doctorLicenceNumber)
                         .call();
-                    setDoctorDetails(fetchDoctorDetails);
-                    console.log('Logged In');
+                    console.log("Doctor details:", fetchDoctorDetails);
+                    console.log('Login successful');
                 } else {
+                    console.log("Password validation failed");
                     alert("Incorrect password");
                 }
             } else {
+                console.log("Doctor not registered");
                 alert("Doctor not registered");
             }
         } catch (error) {
-            console.error("Error during doctor login process:", error);
+            console.error("Error during login process:", error);
             alert("An error occurred while checking registration.");
         }
-    };
+    }
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -69,7 +77,7 @@ function DoctorLogin({ setIsRegistered, setDoctorDetails }) {
                     value={doctorCredentials.licenseNumber}
                     onChange={handleInputChange}
                     placeholder="Medical License Number"
-                    className="w-full pl-14 pr-6 py-3 rounded-full bg-gray-100 border-0 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
+                    className="w-full px-7 py-3 rounded-full bg-gray-100 border-0 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
                 />
             </div>
 
@@ -80,7 +88,7 @@ function DoctorLogin({ setIsRegistered, setDoctorDetails }) {
                     value={doctorCredentials.password}
                     onChange={handleInputChange}
                     placeholder="Password"
-                    className="w-full pl-14 pr-6 py-3 rounded-full bg-gray-100 border-0 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
+                    className="w-full px-7 py-3 rounded-full bg-gray-100 border-0 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
                 />
             </div>
 

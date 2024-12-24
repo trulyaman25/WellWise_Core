@@ -1,10 +1,9 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from "react-router-dom";
+import { useState } from 'react';
 import PatientLogin from './forms/patientForm';
 import DoctorLogin from './forms/doctorForm';
 import DispensaryLogin from './forms/dispensaryForm';
 
-export default function Login() {
+function Login() {
     const [userType, setUserType] = useState('patient');
     const [isRegistered, setIsRegistered] = useState(false);
     const [patientDetails, setPatientDetails] = useState(null);
@@ -42,7 +41,14 @@ export default function Login() {
                         <DispensaryLogin setIsRegistered={setIsRegistered} setDispensaryDetails={setDispensaryDetails} />
                     )}
                 </div>
+
+                <div className="text-center text-sm text-gray-500 font-albulaMedium mt-5">
+                    <span>New <span className='capitalize'>{userType}</span>?{' '}</span>
+                    <a href="/register" className="text-gray-900 hover:underline">Register Here</a>
+                </div>
             </div>
         </div>
     );
 }
+
+export default Login;

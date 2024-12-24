@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Lock, User } from 'lucide-react';
 import Web3 from 'web3';
 import PatientRegistration from "../../../build/contracts/PatientRegistration.json";
@@ -11,30 +11,51 @@ export default function Login() {
     const [patientCredentials, setPatientCredentials] = useState({
         healthID: '',
         password: '',
-    })
+    });
 
     const [doctorCredentials, setDoctorCredentials] = useState({
         licenseNumber: '',
         password: '',
-    })
+    });
 
     const [dispensaryCredentials, setDispensaryCredentials] = useState({
         licenseNumber: '',
         password: '',
-    })
+    });
 
     const navigate = useNavigate();
     const [isRegistered, setIsRegistered] = useState(false);
 
+    useEffect(() => {
+        if (userType !== 'patient') {
+            setPatientCredentials({
+                healthID: '',
+                password: '',
+            });
+        }
+        if (userType !== 'doctor') {
+            setDoctorCredentials({
+                licenseNumber: '',
+                password: '',
+            });
+        }
+        if (userType !== 'dispensary') {
+            setDispensaryCredentials({
+                licenseNumber: '',
+                password: '',
+            });
+        }
+    }, [userType]);
+
     const handlePatientSubmit = async (e) => {
         e.preventDefault();
-    
+
         const patientHealthID = patientCredentials.healthID;
         const patientPassword = patientCredentials.password;
-    
+
         try {
             console.log("Starting the Login process...");
-    
+
             const web3 = new Web3(window.ethereum);
             const networkId = await web3.eth.net.getId();
             const deployedNetwork = PatientRegistration.networks[networkId];
@@ -42,25 +63,25 @@ export default function Login() {
                 PatientRegistration.abi,
                 deployedNetwork && deployedNetwork.address
             )
-    
+
             console.log("Patient Health ID:", patientHealthID);
             console.log("Patient Password:", patientPassword);
-    
+
             const isRegisteredResult = await contract.methods
                 .isRegisteredPatient(patientHealthID)
                 .call();
             console.log("Is Registered Result:", isRegisteredResult);
-    
+
             setIsRegistered(isRegisteredResult);
-    
+
             if (isRegisteredResult) {
                 console.log("Patient is registered, checking password...");
-    
+
                 const isValidPassword = await contract.methods
                     .validatePassword(patientHealthID, patientPassword)
                     .call();
                 console.log("Is Valid Password:", isValidPassword);
-    
+
                 if (isValidPassword) {
                     const fetchPatientDetails = await contract.methods
                         .getPatientDetails(patientHealthID)
@@ -81,17 +102,15 @@ export default function Login() {
         }
     };
 
-    const [doctorDetails, setDoctorDetails] = useState(null);
-
     const handleDoctorSubmit = async (e) => {
         e.preventDefault();
-    
+
         const doctorLicenceNumber = doctorCredentials.licenseNumber;
         const doctorPassword = doctorCredentials.password;
-    
+
         try {
             console.log("Starting the doctor login process...");
-    
+
             const web3 = new Web3(window.ethereum);    
             const networkId = await web3.eth.net.getId();    
             const deployedNetwork = DoctorRegistration.networks[networkId];    
@@ -99,25 +118,25 @@ export default function Login() {
                 DoctorRegistration.abi,
                 deployedNetwork && deployedNetwork.address
             );
-    
+
             console.log("Doctor License Number:", doctorLicenceNumber);
             console.log("Doctor Password:", doctorPassword);
-    
+
             const isRegisteredResult = await contract.methods
                 .isRegisteredDoctor(doctorLicenceNumber)
                 .call();
             console.log("Is Registered Doctor:", isRegisteredResult);
-    
+
             setIsRegistered(isRegisteredResult);
-    
+
             if (isRegisteredResult) {
                 console.log("Doctor is registered, validating password...");
-    
+
                 const isValidPassword = await contract.methods
                     .validatePassword(doctorLicenceNumber, doctorPassword)
                     .call();
                 console.log("Is Valid Password:", isValidPassword);
-    
+
                 if (isValidPassword) {
                     console.log("Password is valid. Fetching doctor details...");
                     const fetchDoctorDetails = await contract.methods
@@ -141,21 +160,19 @@ export default function Login() {
         }
     };
 
-    const [dispensaryDetails, setDispensaryDetails] = useState(null);
-    
     const handleDispensarySubmit = async (e) => {
         e.preventDefault();
-    
+
         const dispensaryLicenceNumber = dispensaryCredentials.licenseNumber;
         const dispensaryPassword = dispensaryCredentials.password;
-    
+
         try {
             console.log("Starting the dispensary login process...");
-    
+
             const web3 = new Web3(window.ethereum);    
             const networkId = await web3.eth.net.getId();    
             const deployedNetwork = DispensaryRegistration.networks[networkId];
-    
+
             const contract = new web3.eth.Contract(
                 DispensaryRegistration.abi,
                 deployedNetwork && deployedNetwork.address
@@ -163,22 +180,22 @@ export default function Login() {
 
             console.log("Dispensary License Number:", dispensaryLicenceNumber);
             console.log("Dispensary Password:", dispensaryPassword);
-    
+
             console.log("Checking if dispensary is registered...");
             const isRegisteredResult = await contract.methods
                 .isRegisteredDiagnostic(dispensaryLicenceNumber)
                 .call();
             console.log("Is Registered Diagnostic:", isRegisteredResult);
-    
+
             setIsRegistered(isRegisteredResult);
-    
+
             if (isRegisteredResult) {
                 console.log("Dispensary is registered. Validating password...");
                 const isValidPassword = await contract.methods
                     .validatePassword(dispensaryLicenceNumber, dispensaryPassword)
                     .call();
                 console.log("Is Valid Password:", isValidPassword);
-    
+
                 if (isValidPassword) {
                     console.log("Password is valid. Fetching dispensary details...");
                     const diagnostic = await contract.methods
@@ -201,12 +218,10 @@ export default function Login() {
             alert("An error occurred while checking registration.");
         }
     };
-    
-    
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-    
+
         if (userType === 'patient') {
             setPatientCredentials((prev) => ({
                 ...prev,
@@ -245,7 +260,7 @@ export default function Login() {
                     <div className="space-y-2">
                         <h1 className="text-4xl font-albulaHeavy">
                             <div>Login as</div>
-                            <div className={`uppercase mt-2 ${ userType === 'patient' ? 'text-green-400' : userType === 'doctor' ? 'text-yellow-400' : 'text-red-400' }`}>
+                            <div className={`uppercase mt-2 ${userType === 'patient' ? 'text-green-400' : userType === 'doctor' ? 'text-yellow-400' : 'text-red-400'}`}>
                                 {userType}
                             </div>
                         </h1>
@@ -253,13 +268,13 @@ export default function Login() {
 
                     <div className="flex rounded-full bg-gray-100 p-1">
                         {['patient', 'doctor', 'dispensary'].map((type) => (
-                            <button key={type} className={`w-full text-sm font-albulaBold px-6 py-3 rounded-full transition-colors ${ userType === type ? type === 'patient' ? 'bg-green-400 text-white shadow' : type === 'doctor' ? 'bg-yellow-400 text-white shadow' : 'bg-red-400 text-white shadow' : 'text-gray-500 hover:text-gray-900' }`} onClick={() => setUserType(type)} >
+                            <button key={type} className={`w-full text-sm font-albulaBold px-6 py-3 rounded-full transition-colors ${userType === type ? type === 'patient' ? 'bg-green-400 text-white shadow' : type === 'doctor' ? 'bg-yellow-400 text-white shadow' : 'bg-red-400 text-white shadow' : 'text-gray-500 hover:text-gray-900'}`} onClick={() => setUserType(type)} >
                                 {type.charAt(0).toUpperCase() + type.slice(1)}
                             </button>
                         ))}
                     </div>
 
-                    <form onSubmit={userType == 'patient' ? handlePatientSubmit : userType == 'doctor' ? handleDoctorSubmit : handleDispensarySubmit} className="space-y-4">
+                    <form onSubmit={userType === 'patient' ? handlePatientSubmit : userType === 'doctor' ? handleDoctorSubmit : handleDispensarySubmit} className="space-y-4">
                         <div className="relative">
                             <User className="absolute left-6 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                             <input
@@ -281,7 +296,7 @@ export default function Login() {
                             <input
                                 type="password"
                                 name="password"
-                                value={userType == 'patient' ? patientCredentials.password : userType == 'doctor' ? doctorCredentials.password : dispensaryCredentials.password}
+                                value={userType === 'patient' ? patientCredentials.password : userType === 'doctor' ? doctorCredentials.password : dispensaryCredentials.password}
                                 onChange={handleInputChange}
                                 placeholder="Password"
                                 className="w-full pl-14 pr-6 py-3 rounded-full bg-gray-100 border-0 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"

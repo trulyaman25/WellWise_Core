@@ -11,7 +11,7 @@ const PatientForm = ({ patientData, handleInputChange, toggleDropdown, isGenderD
                 value={patientData.cryptoWalletAddress}
                 onChange={handleInputChange}
                 placeholder="Crypto Wallet Address"
-                className="w-full px-6 py-3 rounded-full bg-gray-100 border-0 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
+                className="w-full px-6 py-3 mt-2 rounded-full text-[15px] text-center bg-gray-100 border-0 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
             />
         </div>
 
@@ -351,6 +351,7 @@ export default function Register() {
 
     const [web3, setWeb3] = useState(null);
     const [contract, setContract] = useState(null);
+    const [availableAccounts, setAvailableAccounts] = useState([]);
 
     useEffect(() => {
         const init = async () => {
@@ -359,15 +360,25 @@ export default function Register() {
                 try {
                     await window.ethereum.enable();
                     setWeb3(web3Instance);
-            
+
+                    const accounts = await web3Instance.eth.getAccounts();
+                    if (accounts.length > 0) {
+                        setPatientData((prevData) => ({
+                            ...prevData,
+                            cryptoWalletAddress: accounts[0]
+                        }));
+                    }
+
+                    setAvailableAccounts(accounts);
+
                     const networkId = await web3Instance.eth.net.getId();
-                    console.log(networkId);
+                    console.log("Network ID:", networkId);
+
                     const deployedNetwork = PatientRegistration.networks[networkId];
                     const contractInstance = new web3Instance.eth.Contract(
                         PatientRegistration.abi,
                         deployedNetwork && deployedNetwork.address
                     );
-            
                     setContract(contractInstance);
                 } catch (error) {
                     console.error("User denied access to accounts.");
@@ -376,47 +387,76 @@ export default function Register() {
                 console.log("Please install MetaMask extension");
             }
         };
-    
+
         init();
     }, []);
 
-    const handleSubmit = async (e) => {
+    const handlePatientSubmit = async (e) => {
         e.preventDefault();
         try {
+            console.log("Starting patient registration process...");
+    
             const web3 = new Web3(window.ethereum);
             const networkId = await web3.eth.net.getId();
-        
             const contract = new web3.eth.Contract(
                 PatientRegistration.abi,
                 PatientRegistration.networks[networkId].address
             );
-        
+    
+            console.log("Checking if patient is already registered...");
+    
             const isRegPatient = await contract.methods
                 .isRegisteredPatient(patientData.healthId)
                 .call();
-        
+            console.log("Is Registered Patient:", isRegPatient);
+    
             if (isRegPatient) {
                 alert("Patient already exists");
+                console.log("Patient already exists, aborting registration");
                 return;
             }
-        
+    
+            console.log("Registering patient with the following details:", patientData);
+    
             await contract.methods
                 .registerPatient(
                     patientData.cryptoWalletAddress,
                     patientData.fullName,
                     patientData.gender,
-                    patientData.healthId,
                     patientData.email,
+                    patientData.healthId,
                     patientData.password
                 )
                 .send({ from: patientData.cryptoWalletAddress });
-        
-                alert("Patient registered successfully!");
-            } catch (error) {
-                console.error("Error:", error);
-                alert("An error occurred while registering the doctor.");
-            }
-      };
+    
+            alert("Patient registered successfully!");
+            console.log("Patient registration successful");
+    
+        } catch (error) {
+            console.error("Error:", error);
+            alert("An error occurred while registering the doctor.");
+            console.log("Registration error:", error);
+        }
+    };
+
+    const handleDoctorSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            console.log("Starting doctor registration process...");
+        } catch (error) {
+
+        }
+    };
+
+    const handleDispensarySubmit = async (e) => {
+        e.preventDefault();
+        try {
+            console.log("Starting dispensary registration process...");
+        } catch (error) {
+
+        }
+    };
+    
 
     return (
         <div className="h-screen w-screen bg-gray-50 p-4 md:p-8 flex items-center justify-center">
@@ -451,7 +491,7 @@ export default function Register() {
                         ))}
                     </div>
 
-                    <form onSubmit={handleSubmit} className="space-y-4">
+                    <form onSubmit={userType == 'patient' ? handlePatientSubmit : userType == 'doctor' ? handleDoctorSubmit : handleDispensarySubmit} className="space-y-4">
                         {userType === 'patient' && (
                             <PatientForm
                                 patientData={patientData}

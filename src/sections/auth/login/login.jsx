@@ -22,57 +22,64 @@ export default function Login() {
     })
 
     const navigate = useNavigate();
-    const [hhNumberError, sethhNumberError] = useState("");
     const [isRegistered, setIsRegistered] = useState(false);
-    const [doctorDetails, setPatientDetails] = useState(null);
+    const [patientDetails, setPatientDetails] = useState(null);
 
     const handleCheckRegistration = async (e) => {
         e.preventDefault();
-
+    
         const patientHealthID = patientCredentials.healthID;
         const patientPassword = patientCredentials.password;
-
+    
         try {
+            console.log("Starting the registration check process...");
+    
             const web3 = new Web3(window.ethereum);
             const networkId = await web3.eth.net.getId();
             const deployedNetwork = PatientRegistration.networks[networkId];
             const contract = new web3.eth.Contract(
                 PatientRegistration.abi,
                 deployedNetwork && deployedNetwork.address
-            );
+            )
     
-            console.log(patientHealthID);
-            console.log(patientPassword);
-
+            console.log("Patient Health ID:", patientHealthID);
+            console.log("Patient Password:", patientPassword);
+    
             const isRegisteredResult = await contract.methods
                 .isRegisteredPatient(patientHealthID)
                 .call();
+            console.log("Is Registered Result:", isRegisteredResult);
+    
             setIsRegistered(isRegisteredResult);
-            console.log(isRegisteredResult);
     
             if (isRegisteredResult) {
+                console.log("Patient is registered, checking password...");
+    
                 const isValidPassword = await contract.methods
                     .validatePassword(patientHealthID, patientPassword)
                     .call();
+                console.log("Is Valid Password:", isValidPassword);
     
                 if (isValidPassword) {
-                    const doctor = await contract.methods
+                    const fetchPatientDetails = await contract.methods
                         .getPatientDetails(patientHealthID)
                         .call();
-                    setPatientDetails(doctor);
+                    console.log("Patient details:", fetchPatientDetails);
                     console.log('Logged In');
-                    navigate("/dashboard");  // Navigate after successful login
                 } else {
                     alert("Incorrect password");
+                    console.log("Password validation failed");
                 }
             } else {
                 alert("Patient not registered");
+                console.log("Patient not registered");
             }
         } catch (error) {
             console.error("Error checking registration:", error);
             alert("An error occurred while checking registration.");
         }
     };
+    
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -167,6 +174,11 @@ export default function Login() {
                                     </svg>
                                 </div>
                             </button>
+                        </div>
+
+                        <div className="text-center text-sm text-gray-500 font-albulaMedium">
+                            <span>New <span className='capitalize'>{userType}</span>?{' '}</span>
+                            <a href="/register" className="text-gray-900 hover:underline">Register Here</a>
                         </div>
                     </form>
                 </div>

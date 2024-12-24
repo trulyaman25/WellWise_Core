@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import PatientRegistration from "../../../build/contracts/PatientRegistration.json";
 import DoctorRegistration from "../../../build/contracts/DoctorRegistration.json";
+import DispensaryRegistration from "../../../build/contracts/DiagnosticRegistration.json";
 import Web3 from 'web3';
 import { useNavigate } from 'react-router-dom';
 
@@ -493,8 +494,37 @@ export default function Register() {
         e.preventDefault();
         try {
             console.log("Starting dispensary registration process...");
-        } catch (error) {
+            const web3 = new Web3(window.ethereum);
+            const networkId = await web3.eth.net.getId();
+            const contract = new web3.eth.Contract(
+                DispensaryRegistration.abi,
+                DispensaryRegistration.networks[networkId].address
+            );
 
+            const isDispensaryRegistered = await contract.methods
+                .isRegisteredDiagnostic(dispensaryData.cryptoWalletAddress)
+                .call();
+
+            if (isDispensaryRegistered) {
+                alert("Dispensary already exists");
+                return;
+            }
+
+            await contract.methods
+                .registerDiagnostic(
+                    dispensaryData.dispensaryName,
+                    dispensaryData.hospitalName,
+                    dispensaryData.licenseNumber,
+                    dispensaryData.email,
+                    dispensaryData.password
+                )
+                .send({ from: dispensaryData.cryptoWalletAddress });
+
+            alert("Dispensary registered successfully!");
+            navigate("/login");
+        } catch (error) {
+            console.error("Error:", error);
+            alert("An error occurred while registering the diagnostic.");
         }
     };
     

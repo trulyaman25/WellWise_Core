@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { Lock, User } from 'lucide-react';
 import Web3 from 'web3';
 import PatientRegistration from "../../../build/contracts/PatientRegistration.json";
+import DoctorRegistration from "../../../build/contracts/DoctorRegistration.json";
+import DispensaryRegistration from "../../../build/contracts/DiagnosticRegistration.json";
 import { useNavigate } from "react-router-dom";
 
 export default function Login() {
@@ -23,16 +25,15 @@ export default function Login() {
 
     const navigate = useNavigate();
     const [isRegistered, setIsRegistered] = useState(false);
-    const [patientDetails, setPatientDetails] = useState(null);
 
-    const handleCheckRegistration = async (e) => {
+    const handlePatientSubmit = async (e) => {
         e.preventDefault();
     
         const patientHealthID = patientCredentials.healthID;
         const patientPassword = patientCredentials.password;
     
         try {
-            console.log("Starting the registration check process...");
+            console.log("Starting the Login process...");
     
             const web3 = new Web3(window.ethereum);
             const networkId = await web3.eth.net.getId();
@@ -79,6 +80,128 @@ export default function Login() {
             alert("An error occurred while checking registration.");
         }
     };
+
+    const [doctorDetails, setDoctorDetails] = useState(null);
+
+    const handleDoctorSubmit = async (e) => {
+        e.preventDefault();
+    
+        const doctorLicenceNumber = doctorCredentials.licenseNumber;
+        const doctorPassword = doctorCredentials.password;
+    
+        try {
+            console.log("Starting the doctor login process...");
+    
+            const web3 = new Web3(window.ethereum);    
+            const networkId = await web3.eth.net.getId();    
+            const deployedNetwork = DoctorRegistration.networks[networkId];    
+            const contract = new web3.eth.Contract(
+                DoctorRegistration.abi,
+                deployedNetwork && deployedNetwork.address
+            );
+    
+            console.log("Doctor License Number:", doctorLicenceNumber);
+            console.log("Doctor Password:", doctorPassword);
+    
+            const isRegisteredResult = await contract.methods
+                .isRegisteredDoctor(doctorLicenceNumber)
+                .call();
+            console.log("Is Registered Doctor:", isRegisteredResult);
+    
+            setIsRegistered(isRegisteredResult);
+    
+            if (isRegisteredResult) {
+                console.log("Doctor is registered, validating password...");
+    
+                const isValidPassword = await contract.methods
+                    .validatePassword(doctorLicenceNumber, doctorPassword)
+                    .call();
+                console.log("Is Valid Password:", isValidPassword);
+    
+                if (isValidPassword) {
+                    console.log("Password is valid. Fetching doctor details...");
+                    const fetchDoctorDetails = await contract.methods
+                        .getDoctorDetails(doctorLicenceNumber)
+                        .call();
+
+                    setDoctorDetails(fetchDoctorDetails);
+                    console.log("Doctor details:", doctorDetails);
+                    console.log('Logged In');
+                } else {
+                    console.log("Password validation failed.");
+                    alert("Incorrect password");
+                }
+            } else {
+                console.log("Doctor not registered.");
+                alert("Doctor not registered");
+            }
+        } catch (error) {
+            console.error("Error during doctor login process:", error);
+            alert("An error occurred while checking registration.");
+        }
+    };
+
+    const [dispensaryDetails, setDispensaryDetails] = useState(null);
+    
+    const handleDispensarySubmit = async (e) => {
+        e.preventDefault();
+    
+        const dispensaryLicenceNumber = dispensaryCredentials.licenseNumber;
+        const dispensaryPassword = dispensaryCredentials.password;
+    
+        try {
+            console.log("Starting the dispensary login process...");
+    
+            const web3 = new Web3(window.ethereum);    
+            const networkId = await web3.eth.net.getId();    
+            const deployedNetwork = DispensaryRegistration.networks[networkId];
+    
+            const contract = new web3.eth.Contract(
+                DispensaryRegistration.abi,
+                deployedNetwork && deployedNetwork.address
+            );
+
+            console.log("Dispensary License Number:", dispensaryLicenceNumber);
+            console.log("Dispensary Password:", dispensaryPassword);
+    
+            console.log("Checking if dispensary is registered...");
+            const isRegisteredResult = await contract.methods
+                .isRegisteredDiagnostic(dispensaryLicenceNumber)
+                .call();
+            console.log("Is Registered Diagnostic:", isRegisteredResult);
+    
+            setIsRegistered(isRegisteredResult);
+    
+            if (isRegisteredResult) {
+                console.log("Dispensary is registered. Validating password...");
+                const isValidPassword = await contract.methods
+                    .validatePassword(dispensaryLicenceNumber, dispensaryPassword)
+                    .call();
+                console.log("Is Valid Password:", isValidPassword);
+    
+                if (isValidPassword) {
+                    console.log("Password is valid. Fetching dispensary details...");
+                    const diagnostic = await contract.methods
+                        .getDiagnosticDetails(dispensaryLicenceNumber)
+                        .call();
+                    
+                    setDispensaryDetails(diagnostic);
+                    console.log("Dispensary Details:", dispensaryDetails);
+                    console.log('Logged In');
+                } else {
+                    console.log("Invalid password provided.");
+                    alert("Incorrect password");
+                }
+            } else {
+                console.log("Dispensary not registered.");
+                alert("Diagnostic not registered");
+            }
+        } catch (error) {
+            console.error("Error during login process:", error);
+            alert("An error occurred while checking registration.");
+        }
+    };
+    
     
 
     const handleInputChange = (e) => {
@@ -136,7 +259,7 @@ export default function Login() {
                         ))}
                     </div>
 
-                    <form onSubmit={handleCheckRegistration} className="space-y-4">
+                    <form onSubmit={userType == 'patient' ? handlePatientSubmit : userType == 'doctor' ? handleDoctorSubmit : handleDispensarySubmit} className="space-y-4">
                         <div className="relative">
                             <User className="absolute left-6 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                             <input

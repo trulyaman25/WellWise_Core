@@ -273,7 +273,7 @@ const DispensaryForm = ({ dispensaryData, handleInputChange }) => (
     </>
 );
 
-export default function SignupPage() {
+export default function Register() {
     const [userType, setUserType] = useState('patient');
 
     const [patientData, setPatientData] = useState({
@@ -348,11 +348,73 @@ export default function SignupPage() {
         }
     };
 
-    const handleSubmit = (e) => {
+    const [web3, setWeb3] = useState(null);
+    const [contract, setContract] = useState(null);
+
+    useEffect(() => {
+        const init = async () => {
+            if (window.ethereum) {
+                const web3Instance = new Web3(window.ethereum);
+                try {
+                    await window.ethereum.enable();
+                    setWeb3(web3Instance);
+            
+                    const networkId = await web3Instance.eth.net.getId();
+                    const deployedNetwork = PatientRegistration.networks[networkId];
+                    const contractInstance = new web3Instance.eth.Contract(
+                        PatientRegistration.abi,
+                        deployedNetwork && deployedNetwork.address
+                    );
+            
+                    setContract(contractInstance);
+                } catch (error) {
+                    console.error("User denied access to accounts.");
+                }
+            } else {
+                console.log("Please install MetaMask extension");
+            }
+        };
+    
+        init();
+    }, []);
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log(`User Type: ${userType}`);
-        console.log(userType === 'patient' ? patientData : userType === 'doctor' ? doctorData : dispensaryData);
-    };
+        try {
+            const web3 = new Web3(window.ethereum);
+            const networkId = await web3.eth.net.getId();
+        
+            const contract = new web3.eth.Contract(
+                PatientRegistration.abi,
+                PatientRegistration.networks[networkId].address
+            );
+        
+            const isRegPatient = await contract.methods
+                .isRegisteredPatient(patientData.healthId)
+                .call();
+        
+            if (isRegPatient) {
+                alert("Patient already exists");
+                return;
+            }
+        
+            await contract.methods
+                .registerPatient(
+                    patientData.cryptoWalletAddress,
+                    patientData.fullName,
+                    patientData.gender,
+                    patientData.healthId,
+                    patientData.email,
+                    patientData.password
+                )
+                .send({ from: patientData.cryptoWalletAddress });
+        
+                alert("Patient registered successfully!");
+            } catch (error) {
+                console.error("Error:", error);
+                alert("An error occurred while registering the doctor.");
+            }
+      };
 
     return (
         <div className="h-screen w-screen bg-gray-50 p-4 md:p-8 flex items-center justify-center">

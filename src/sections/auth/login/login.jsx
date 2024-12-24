@@ -1,5 +1,8 @@
 import { useState } from 'react';
 import { Lock, User } from 'lucide-react';
+import Web3 from 'web3';
+import PatientRegistration from "../../../build/contracts/PatientRegistration.json";
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
     const [userType, setUserType] = useState('patient');
@@ -17,6 +20,59 @@ export default function Login() {
         licenseNumber: '',
         password: '',
     })
+
+    const navigate = useNavigate();
+    const [hhNumberError, sethhNumberError] = useState("");
+    const [isRegistered, setIsRegistered] = useState(false);
+    const [doctorDetails, setPatientDetails] = useState(null);
+
+    const handleCheckRegistration = async (e) => {
+        e.preventDefault();
+
+        const patientHealthID = patientCredentials.healthID;
+        const patientPassword = patientCredentials.password;
+
+        try {
+            const web3 = new Web3(window.ethereum);
+            const networkId = await web3.eth.net.getId();
+            const deployedNetwork = PatientRegistration.networks[networkId];
+            const contract = new web3.eth.Contract(
+                PatientRegistration.abi,
+                deployedNetwork && deployedNetwork.address
+            );
+    
+            console.log(patientHealthID);
+            console.log(patientPassword);
+
+            const isRegisteredResult = await contract.methods
+                .isRegisteredPatient(patientHealthID)
+                .call();
+            setIsRegistered(isRegisteredResult);
+            console.log(isRegisteredResult);
+    
+            if (isRegisteredResult) {
+                const isValidPassword = await contract.methods
+                    .validatePassword(patientHealthID, patientPassword)
+                    .call();
+    
+                if (isValidPassword) {
+                    const doctor = await contract.methods
+                        .getPatientDetails(patientHealthID)
+                        .call();
+                    setPatientDetails(doctor);
+                    console.log('Logged In');
+                    navigate("/dashboard");  // Navigate after successful login
+                } else {
+                    alert("Incorrect password");
+                }
+            } else {
+                alert("Patient not registered");
+            }
+        } catch (error) {
+            console.error("Error checking registration:", error);
+            alert("An error occurred while checking registration.");
+        }
+    };
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -36,19 +92,6 @@ export default function Login() {
                 ...prev,
                 [name]: value,
             }));
-        }
-    };
-    
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        console.log("User Type: ", userType);
-        if(userType == 'patient'){
-            console.log(patientCredentials);
-        } else if (userType == 'doctor'){
-            console.log(doctorCredentials);
-        } else {
-            console.log(dispensaryCredentials);
         }
     };
 
@@ -86,24 +129,21 @@ export default function Login() {
                         ))}
                     </div>
 
-                    <form onSubmit={handleSubmit} className="space-y-4">
+                    <form onSubmit={handleCheckRegistration} className="space-y-4">
                         <div className="relative">
                             <User className="absolute left-6 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                             <input
                                 type="text"
                                 name={userType === 'patient' ? 'healthID' : 'licenseNumber'}
-                                value={
-                                    userType === 'patient'
-                                        ? patientCredentials.healthID
-                                        : userType === 'doctor'
-                                        ? doctorCredentials.licenseNumber
-                                        : dispensaryCredentials.licenseNumber
-                                }
+                                value={userType === 'patient'
+                                    ? patientCredentials.healthID
+                                    : userType === 'doctor'
+                                    ? doctorCredentials.licenseNumber
+                                    : dispensaryCredentials.licenseNumber}
                                 onChange={handleInputChange}
                                 placeholder={getPlaceholder()}
                                 className="w-full pl-14 pr-6 py-3 rounded-full bg-gray-100 border-0 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
                             />
-
                         </div>
 
                         <div className="relative">
@@ -119,7 +159,7 @@ export default function Login() {
                         </div>
 
                         <div>
-                            <button type="submit" className="w-full mt-5 bg-gray-900 text-white px-4 py-3 rounded-full font-albulaBold hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 transition-all ease-in-out duration-200" >
+                            <button type="submit" className="w-full mt-5 bg-gray-900 text-white px-4 py-3 rounded-full font-albulaBold hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 transition-all ease-in-out duration-200">
                                 <div className="flex items-center justify-center">
                                     <span>Login</span>
                                     <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -127,11 +167,6 @@ export default function Login() {
                                     </svg>
                                 </div>
                             </button>
-                        </div>
-
-                        <div className="text-center text-sm text-gray-500 font-albulaMedium">
-                            <span>New <span className='capitalize'>{userType}</span>?{' '}</span>
-                            <a href="/register" className="text-gray-900 hover:underline">Register Here</a>
                         </div>
                     </form>
                 </div>

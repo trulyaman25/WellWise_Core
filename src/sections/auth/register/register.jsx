@@ -361,6 +361,7 @@ export default function Register() {
                     setWeb3(web3Instance);
             
                     const networkId = await web3Instance.eth.net.getId();
+                    console.log(networkId);
                     const deployedNetwork = PatientRegistration.networks[networkId];
                     const contractInstance = new web3Instance.eth.Contract(
                         PatientRegistration.abi,

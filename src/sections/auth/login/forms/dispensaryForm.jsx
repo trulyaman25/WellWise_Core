@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Web3 from 'web3';
 import DispensaryRegistration from "../../../../build/contracts/DiagnosticRegistration.json";
 
@@ -7,6 +8,8 @@ function DispensaryLogin({ setIsRegistered, setDispensaryDetails }) {
         licenseNumber: '',
         password: '',
     });
+
+    const navigate = useNavigate();
 
     const handleDispensarySubmit = async (e) => {
         e.preventDefault();
@@ -48,6 +51,8 @@ function DispensaryLogin({ setIsRegistered, setDispensaryDetails }) {
                     setDispensaryDetails(fetchDispensaryDetails);
                     console.log("Dispensary details:", fetchDispensaryDetails);
                     console.log('Login successful');
+                    console.log('Redirecting....');
+                    navigate("/dispensary/" + dispensaryLicenceNumber);
                 } else {
                     console.log("Password validation failed");
                     alert("Incorrect password");

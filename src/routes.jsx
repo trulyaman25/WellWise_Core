@@ -27,9 +27,9 @@ function RouteWithHeaderFooter() {
 				<Route path='/' element={<Home />} />
 				<Route path="/register" element={<Register />} />
 				<Route path="/login" element={<Login />} />
-				<Route path="/patient" element={<PatientDashboard />} />
-				<Route path="/doctor" element={<DoctorDashboard />} />
-				<Route path="/dispensary" element={<DispensaryDashboard />} />
+				<Route path="/patient/:healthID" element={<PatientDashboard />} />
+				<Route path="/doctor/:medicalLicenceNumber" element={<DoctorDashboard />} />
+				<Route path="/dispensary/:businessLicenceNumber" element={<DispensaryDashboard />} />
 			</Routes>
 
 			{location.pathname === '/' && <Footer />}

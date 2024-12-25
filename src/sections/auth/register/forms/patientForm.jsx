@@ -94,7 +94,7 @@ function PatientForm() {
                         value={patientData.cryptoWalletAddress}
                         onChange={handleInputChange}
                         placeholder="Crypto Wallet Address"
-                        className="w-full px-6 py-3 mt-2 rounded-full bg-gray-100 border-0 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
+                        className="w-full px-6 py-3 rounded-full bg-gray-100 border-0 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
                     />
                 </div>
             

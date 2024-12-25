@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Web3 from 'web3';
 import DoctorRegistration from "../../../../build/contracts/DoctorRegistration.json";
 
@@ -7,6 +8,8 @@ function DoctorLogin({ setIsRegistered, setDoctorDetails }) {
         licenseNumber: '',
         password: '',
     });
+
+    const navigate = useNavigate();
 
     const handleDoctorSubmit = async (e) => {
         e.preventDefault();
@@ -46,6 +49,8 @@ function DoctorLogin({ setIsRegistered, setDoctorDetails }) {
                         .call();
                     console.log("Doctor details:", fetchDoctorDetails);
                     console.log('Login successful');
+                    console.log('Redirecting....');
+                    navigate("/doctor/" + doctorLicenceNumber);
                 } else {
                     console.log("Password validation failed");
                     alert("Incorrect password");

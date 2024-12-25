@@ -50,7 +50,7 @@ export default function Register() {
     return (
         <div className="h-screen w-screen bg-gray-50 p-4 md:p-8 flex items-center justify-center">
             <div className="w-full lg:w-1/2 p-8 lg:p-12 flex flex-col justify-center">
-                <div className="max-w-md w-fit mx-auto space-y-8">
+                <div className="max-w-md w-full mx-auto space-y-8">
                     <div className="space-y-2">
                         <h1 className="text-4xl font-albulaHeavy">
                             <div>Register Yourself as</div>

@@ -57,22 +57,21 @@ contract DoctorRegistration {
     event DoctorRegistered(string licenseNumber, string doctorName, address cryptoWalletAddress);
 
     function registerDoctorCredentials(
-        address _cryptoWalletAddress,
         string memory _name,
         string memory _medicalLicenseNumber,
         string memory _email,
         string memory _password
     ) public {
         doctors[_medicalLicenseNumber].credential = DoctorCredentials({
-            walletAddress: _cryptoWalletAddress,
+            walletAddress: msg.sender,
             doctorName: _name,
             licenseNumber: _medicalLicenseNumber,
             email: _email,
             password: _password
         });
 
-        doctorAddresses[_medicalLicenseNumber] = _cryptoWalletAddress;
-        emit DoctorRegistered(_medicalLicenseNumber, _name, _cryptoWalletAddress);
+        doctorAddresses[_medicalLicenseNumber] = msg.sender;
+        emit DoctorRegistered(_medicalLicenseNumber, _name, msg.sender);
     }
 
     function registerDoctorPersonalDetails(

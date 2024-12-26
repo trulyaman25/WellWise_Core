@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Web3 from 'web3';
-import DispensaryRegistration from "../../../../build/contracts/DiagnosticRegistration.json";
+import DispensaryRegistration from "../../../../build/contracts/DispensaryRegistration.json";
 
-function DispensaryForm () {
+function DispensaryForm({setInitialRegistration}) {
     const [dispensaryData, setDispensaryData] = useState({
         cryptoWalletAddress: '',
         dispensaryName: '',
@@ -44,9 +44,9 @@ function DispensaryForm () {
                             deployedNetwork.address
                         );
                         setContract(contractInstance);
-                        console.log("Smart contract loaded successfully.");
+                        console.log("Dispensary Smart contract loaded successfully.");
                     } else {
-                        console.error("Smart contract not deployed on the detected network.");
+                        console.error("Dispensary Smart contract not deployed on the detected network.");
                     }
                 } catch (error) {
                     console.error("Error accessing MetaMask or contract:", error);
@@ -74,7 +74,7 @@ function DispensaryForm () {
     
             console.log("Checking if dispensary is already registered...");
             const isDispensaryRegistered = await contract.methods
-                .isRegisteredDiagnostic(dispensaryData.cryptoWalletAddress)
+                .isDispensaryRegistered(dispensaryData.licenseNumber)
                 .call();
             console.log("Is Dispensary Registered:", isDispensaryRegistered);
     
@@ -87,16 +87,16 @@ function DispensaryForm () {
             console.log("Registering dispensary with the following details:", dispensaryData);
 
             await contract.methods
-                .registerDiagnostic(
+                .registerDispensaryCredentials(
                     dispensaryData.dispensaryName,
                     dispensaryData.licenseNumber,
                     dispensaryData.email,
                     dispensaryData.password
                 )
-                .send({ from: dispensaryData.cryptoWalletAddress });
+                .send({ from: connectedAccount });
     
             console.log("Dispensary registration successful!");
-            navigate("/login");
+            setInitialRegistration(true);
         } catch (error) {
             console.error("Error during dispensary registration:", error);
             alert("An error occurred while registering the diagnostic.");
@@ -115,7 +115,7 @@ function DispensaryForm () {
     return (
         <>
             <form onSubmit={handleDispensarySubmit} className="space-y-4">
-                <div>
+                {/* <div>
                     <input
                         type="text"
                         name="cryptoWalletAddress"
@@ -124,7 +124,7 @@ function DispensaryForm () {
                         placeholder="Crypto Wallet Address"
                         className="w-full px-6 py-3 rounded-full text-sm bg-white border border-[#e6eaf0] text-gray-900 placeholder-gray-500 focus:ring-1 focus:ring-gray-700 focus:outline-none"
                     />
-                </div>
+                </div> */}
 
                 <div>
                     <input
@@ -182,7 +182,7 @@ function DispensaryForm () {
                 </div>
 
                 <div>
-                    <button type="submit" className="w-full mt-5 bg-gray-900 text-white px-4 py-3 rounded-full font-albulaBold hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 transition-all ease-in-out duration-200" >
+                    <button type="submit" className="w-full mt-5 bg-[#1a3235] text-white px-4 py-3 rounded-full font-albulaBold hover:bg-[#2d555b] focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 transition-all ease-in-out duration-200" >
                         <div className="flex items-center justify-center">
                             <span> Register </span>
                             <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

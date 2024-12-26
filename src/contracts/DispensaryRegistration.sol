@@ -35,17 +35,17 @@ contract DispensaryRegistration {
 
     event DiagnosticRegistered(string licenseNumber, string dispensaryName, address cryptoWalletAddress);
 
-    function registerDispensaryCredentials( address _cryptoWalletAddress, string memory _name, string memory _licenseNumber, string memory _email, string memory _password ) public {
+    function registerDispensaryCredentials( string memory _name, string memory _licenseNumber, string memory _email, string memory _password ) public {
         dispensaries[_licenseNumber].credential = dispensaryCredentials({
-            walletAddress: _cryptoWalletAddress,
+            walletAddress: msg.sender,
             dispensaryName: _name,
             licenceNumber: _licenseNumber,
             email: _email,
             password: _password
         });
 
-        dispensaryAddresses[_licenseNumber] = _cryptoWalletAddress;
-        emit DiagnosticRegistered(_licenseNumber, _name, _cryptoWalletAddress);
+        dispensaryAddresses[_licenseNumber] = msg.sender;
+        emit DiagnosticRegistered(_licenseNumber, _name, msg.sender);
     }
 
     function registerDispensaryOwnerDetails( string memory _licenseNumber, string memory _ownerName, string memory _ownerEmail, uint256 _ownerPhoneNumber, string memory _ownerGender, uint256 _age ) public {

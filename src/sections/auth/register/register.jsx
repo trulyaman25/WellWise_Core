@@ -1,19 +1,26 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
-import PatientForm from './forms/patientForm';
-import DoctorForm from './forms/doctorForm';
-import DispensaryForm from './forms/dispensaryForm';
+import PatientForm from './initialRegistrationForms/patientForm';
+import DoctorForm from './initialRegistrationForms/doctorForm';
+import DispensaryForm from './initialRegistrationForms/dispensaryForm';
+
+import PatientProfileBuilderForm from './profileBuilderForms/patientForm';
+import DoctorProfileBuilderForm from './profileBuilderForms/doctorForm';
+import DispensaryProfileBuilderForm from './profileBuilderForms/dispensaryForm';
 
 import MosiacIllustration from '/illustration/mosiacPattern.png';
 import WellWiseLogo from '/favicon.png';
 
 function Register() {
     const [userType, setUserType] = useState('patient');
+    const [patientInitialRegistration, setPatientInitialRegistration] = useState(false);
+    const [doctorInitialRegistration, setDoctorInitialRegistration] = useState(false);
+    const [dispensaryInitialRegistration, setDispensaryInitialRegistration] = useState(false);
     
     return (
         <div className="h-screen w-screen bg-[#e6eaf0] sm:p-8 lg:py-8 flex items-center justify-center">
-            <div className='w-fit h-full bg-white flex p-8 sm:p-14 lg:w-[1335px] sm:rounded-[30px] sm:drop-shadow-lg'>
+            <div className='w-fit h-full bg-white flex p-8 sm:p-14 lg:w-[1300px] sm:rounded-[30px] sm:drop-shadow-lg'>
                 <section className='hidden xl:flex flex-row justify-evenly w-full max-h-full object-cover rounded-3xl '>
                     <img src={MosiacIllustration} alt="Mosiac Illustration" className='h-full'/>
                 </section>
@@ -49,9 +56,9 @@ function Register() {
                             </div>
                         
                             <div className='mt-5'>
-                                {userType === 'patient' && ( <PatientForm/> )}
-                                {userType === 'doctor' && ( <DoctorForm/> )}
-                                {userType === 'dispensary' && ( <DispensaryForm/> )}
+                                {userType === 'patient' && !patientInitialRegistration && ( <PatientForm setInitialRegistration={setPatientInitialRegistration}/> )}
+                                {userType === 'doctor' && !doctorInitialRegistration && ( <DoctorForm setInitialRegistration={setDoctorInitialRegistration}/> )}
+                                {userType === 'dispensary' && !dispensaryInitialRegistration && ( <DispensaryForm setInitialRegistration={setDispensaryInitialRegistration}/> )}
                             </div>
 
                             <div className="text-center text-sm text-gray-500 font-albulaMedium mt-5">

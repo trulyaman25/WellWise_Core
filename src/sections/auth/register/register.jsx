@@ -112,8 +112,8 @@ export default function Register() {
     }
     
     return (
-        <div className="h-fit w-screen bg-[#e6eaf0] sm:p-8 lg:py-8 flex items-center justify-center">
-            <div className='w-full h-full bg-white flex p-8 sm:p-14 lg:w-[1335px] sm:rounded-[30px] sm:drop-shadow-lg'>
+        <div className="h-screen w-screen bg-[#e6eaf0] sm:p-8 lg:py-8 flex items-center justify-center">
+            <div className='w-fit h-full bg-white flex p-8 sm:p-14 lg:w-[1335px] sm:rounded-[30px] sm:drop-shadow-lg'>
                 <div className='hidden xl:flex flex-row justify-evenly w-full max-h-full object-cover rounded-3xl '>
                     <img src={MosiacIllustration} alt="Mosiac Illustration" className='h-full'/>
                 </div>

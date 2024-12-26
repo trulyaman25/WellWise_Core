@@ -26,7 +26,50 @@ function PatientForm() {
     
     const [web3, setWeb3] = useState(null);
     const [contract, setContract] = useState(null);
-    const [availableAccounts, setAvailableAccounts] = useState([]);
+
+    const [connectedAccount, setConnectedAccount] = useState("");
+
+    useEffect(() => {
+        if (connectedAccount) {
+            console.log("Connected account:", connectedAccount.toString());
+        }
+    }, [connectedAccount]);
+
+    useEffect(() => {
+        const init = async () => {
+            if (window.ethereum) {
+                const web3Instance = new Web3(window.ethereum);
+                try {
+                    await window.ethereum.enable();
+                    setWeb3(web3Instance);
+
+                    const accounts = await web3Instance.eth.getAccounts();
+                    setConnectedAccount(accounts[0]);
+
+                    const networkId = await web3Instance.eth.net.getId();
+                    const deployedNetwork = PatientRegistration.networks[networkId];
+
+                    if (deployedNetwork) {
+                        const contractInstance = new web3Instance.eth.Contract(
+                            PatientRegistration.abi,
+                            deployedNetwork.address
+                        );
+                        setContract(contractInstance);
+                        console.log("Smart contract loaded successfully.");
+                    } else {
+                        console.error("Smart contract not deployed on the detected network.");
+                    }
+                } catch (error) {
+                    console.error("Error accessing MetaMask or contract:", error);
+                }
+            } else {
+                alert("MetaMask not detected. Please install the MetaMask extension.");
+                console.error("MetaMask not detected. Please install the MetaMask extension.");
+            }
+        };
+
+        init();
+    }, []);
 
     const handlePatientSubmit = async (e) => {
         e.preventDefault();
@@ -56,22 +99,16 @@ function PatientForm() {
                 console.log("Registering patient with the following details:", patientData);
                 
                 await contract.methods
-                .registerPatientCredentials(
-                    patientData.healthId,
-                    patientData.fullName,
-                    patientData.email,
-                    patientData.password,
-                    patientData.cryptoWalletAddress
-                )
-                .send({ from: patientData.cryptoWalletAddress });
+                    .registerPatientCredentials(
+                        patientData.healthId,
+                        patientData.fullName,
+                        patientData.email,
+                        patientData.password,
+                        connectedAccount
+                    )
+                    .send({ from: connectedAccount });
                 
                 console.log("Patient registration successful");
-                
-                const PatientData = await contract.methods
-                    .getPatientCredentials(patientData.healthId)
-                    .call();
-                console.log(PatientData.name);
-
             } catch (error) {
                 console.error("Error:", error);
                 alert("An error occurred while registering the doctor.");
@@ -94,10 +131,11 @@ function PatientForm() {
                     <input
                         type="text"
                         name="cryptoWalletAddress"
-                        value={patientData.cryptoWalletAddress}
+                        value={connectedAccount}
                         onChange={handleInputChange}
                         placeholder="Crypto Wallet Address"
-                        className="w-full px-6 py-3 rounded-full text-sm bg-white border border-[#e6eaf0] text-gray-900 placeholder-gray-500 focus:ring-1 focus:ring-gray-700 focus:outline-none"
+                        disabled
+                        className="w-full px-6 py-3 text-center rounded-full text-sm bg-gray-200 border border-[#e6eaf0] text-gray-500 placeholder-gray-500 focus:ring-1 focus:ring-gray-700 focus:outline-none cursor-not-allowed"
                     />
                 </div>
             

@@ -16,6 +16,14 @@ function DispensaryForm () {
     const [web3, setWeb3] = useState(null);
     const [contract, setContract] = useState(null);
 
+    const [connectedAccount, setConnectedAccount] = useState(null);
+
+    useEffect(() => {
+        if (connectedAccount) {
+            console.log("Connected account:", connectedAccount.toString());
+        }
+    }, [connectedAccount]);
+
     useEffect(() => {
         const init = async () => {
             if (window.ethereum) {
@@ -25,7 +33,7 @@ function DispensaryForm () {
                     setWeb3(web3Instance);
 
                     const accounts = await web3Instance.eth.getAccounts();
-                    console.log("Connected account:", accounts[0]);
+                    setConnectedAccount(accounts[0]);
 
                     const networkId = await web3Instance.eth.net.getId();
                     const deployedNetwork = DispensaryRegistration.networks[networkId];

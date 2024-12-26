@@ -97,9 +97,16 @@ function PatientLogin({ setIsRegistered, setPatientDetails }) {
                 />
             </div>
 
-            <button type="submit" className="w-full mt-5 bg-gray-900 text-white px-4 py-3 rounded-full font-albulaBold hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 transition-all ease-in-out duration-200">
-                Login
-            </button>
+            <div>
+                <button type="submit" className="group w-full mt-5 bg-[#1a3235] text-white px-4 py-3 rounded-full font-albulaBold hover:bg-[#2d555b] focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 transition-all ease-in-out duration-200">
+                    <div className="flex items-center justify-center relative">
+                        <span className="absolute"> Login </span>
+                        <svg className="w-5 h-5 ml-16 relative transform transition-all duration-200 group-hover:translate-x-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" >
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </div>
+                </button>
+            </div>
         </form>
     );
 }

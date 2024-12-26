@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Web3 from 'web3';
 import PatientRegistration from "../../../../build/contracts/PatientRegistration.json";
@@ -10,6 +10,52 @@ function PatientLogin({ setIsRegistered, setPatientDetails }) {
     });
 
     const navigate = useNavigate();
+    const [web3, setWeb3] = useState(null);
+    const [contract, setContract] = useState(null);
+
+    const [connectedAccount, setConnectedAccount] = useState("");
+
+    useEffect(() => {
+        if (connectedAccount) {
+            console.log("Connected account:", connectedAccount.toString());
+        }
+    }, [connectedAccount]);
+
+    useEffect(() => {
+        const init = async () => {
+            if (window.ethereum) {
+                const web3Instance = new Web3(window.ethereum);
+                try {
+                    await window.ethereum.enable();
+                    setWeb3(web3Instance);
+
+                    const accounts = await web3Instance.eth.getAccounts();
+                    setConnectedAccount(accounts[0]);
+
+                    const networkId = await web3Instance.eth.net.getId();
+                    const deployedNetwork = PatientRegistration.networks[networkId];
+
+                    if (deployedNetwork) {
+                        const contractInstance = new web3Instance.eth.Contract(
+                            PatientRegistration.abi,
+                            deployedNetwork.address
+                        );
+                        setContract(contractInstance);
+                        console.log("Smart contract loaded successfully.");
+                    } else {
+                        console.error("Smart contract not deployed on the detected network.");
+                    }
+                } catch (error) {
+                    console.error("Error accessing MetaMask or contract:", error);
+                }
+            } else {
+                alert("MetaMask not detected. Please install the MetaMask extension.");
+                console.error("MetaMask not detected. Please install the MetaMask extension.");
+            }
+        };
+
+        init();
+    }, []);
 
     const handlePatientSubmit = async (e) => {
         e.preventDefault();
@@ -45,7 +91,7 @@ function PatientLogin({ setIsRegistered, setPatientDetails }) {
 
                 if (isValidPassword) {
                     const fetchPatientDetails = await contract.methods
-                        .getPatientDetails(patientHealthID)
+                        .getPatientCredentials(patientHealthID)
                         .call();
                     console.log("Patient details:", fetchPatientDetails);
                     console.log('Login successful');

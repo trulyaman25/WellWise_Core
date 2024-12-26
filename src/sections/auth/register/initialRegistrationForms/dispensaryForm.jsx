@@ -96,6 +96,7 @@ function DispensaryForm({setInitialRegistration}) {
                 .send({ from: connectedAccount });
     
             console.log("Dispensary registration successful!");
+            navigate(`?licenseNumber=${dispensaryData.licenseNumber}`, { replace: true });
             setInitialRegistration(true);
         } catch (error) {
             console.error("Error during dispensary registration:", error);

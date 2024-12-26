@@ -118,6 +118,7 @@ function DoctorForm({setInitialRegistration}) {
                 .send({ from: connectedAccount });
     
             console.log("Doctor registration successful");
+            navigate(`?licenseNumber=${doctorData.licenseNumber}`, { replace: true });
             setInitialRegistration(true);
         } catch (error) {
             console.error("Error during doctor registration:", error);

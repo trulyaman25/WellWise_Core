@@ -109,6 +109,7 @@ function PatientForm({setInitialRegistration}) {
                     .send({ from: connectedAccount });
                 
                 console.log("Patient registration successful");
+                navigate(`?healthId=${patientData.healthId}`, { replace: true });
                 setInitialRegistration(true);
             } catch (error) {
                 console.error("Error:", error);

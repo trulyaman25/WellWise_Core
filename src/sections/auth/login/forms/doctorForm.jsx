@@ -50,6 +50,7 @@ function DoctorLogin({ setIsRegistered, setDoctorDetails }) {
                     console.log("Doctor details:", fetchDoctorDetails);
                     console.log('Login successful');
                     console.log('Redirecting....');
+                    navigate("/doctor/" + doctorLicenceNumber);
                 } else {
                     console.log("Password validation failed");
                     alert("Incorrect password");

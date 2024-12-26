@@ -52,6 +52,7 @@ function DispensaryLogin({ setIsRegistered, setDispensaryDetails }) {
                     console.log("Dispensary details:", fetchDispensaryDetails);
                     console.log('Login successful');
                     console.log('Redirecting....');
+                    navigate("/dispensary/" + dispensaryLicenceNumber);
                 } else {
                     console.log("Password validation failed");
                     alert("Incorrect password");

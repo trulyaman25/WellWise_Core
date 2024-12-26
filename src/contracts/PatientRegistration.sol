@@ -2,50 +2,114 @@
 pragma solidity ^0.5.16;
 
 contract PatientRegistration {
-    struct Patient {
+    struct PatientCredentials {
         address cryptoWalletAddress;
         string name;
-        string gender;
         string healthID;
         string email;
         string password;
     }
 
-    struct PatientList {
-        string patient_number;
-        string patient_name;
+    struct PatientPersonalDetails {
+        string gender;
+        uint256 age;
+        uint256 date;
+        uint256 month;
+        uint256 year;
+        bool maritalStatus;
+        string disabilities;
+    }
+
+    struct PatientMedicalDetails {
+        uint256 weight;
+        uint256 feet;
+        uint256 inches;
+        string allergies;
+        bool isDiabetic;
+        bool isHypertension;
+    }
+
+    struct PatientLifestyleDetails {
+        string smokingStatus;
+        string alcoholConsumption;
+        string exerciseHabit;
+    }
+
+    struct PatientPolicyDetails {
+        string insuranceProvider;
+        uint256 policyNumber;
+    }
+
+    struct Patient {
+        PatientCredentials credential;
+        PatientPersonalDetails personalDetails;
+        PatientMedicalDetails medicalDetails;
+        PatientLifestyleDetails lifestyleDetails;
+        PatientPolicyDetails policyDetails;
     }
 
     mapping(string => bool) public isPatientRegistered;
-    mapping(string => Patient) public patients;
-    mapping(string => mapping(uint256 => PatientList)) private Dpermission;
-    mapping(string => uint256) private doctorPatientCount;
-    mapping(string => mapping(string => bool)) public doctorPermissions;
+    mapping(string => Patient) private patients;
 
     event PatientRegistered(string healthID, string name, address cryptoWalletAddress);
 
-    function registerPatient(
-        address _cryptoWalletAddress,
-        string memory _name,
-        string memory _gender,
-        string memory _email,
-        string memory _healthID,
-        string memory _password
-    ) public {
-        require(!isPatientRegistered[_healthID], "Patient already registered");
-
-        Patient memory newPatient = Patient({
+    function registerPatientCredentials( string memory _healthID, string memory _name, string memory _email, string memory _password, address _cryptoWalletAddress ) public {
+        patients[_healthID].credential = PatientCredentials({
             cryptoWalletAddress: _cryptoWalletAddress,
             name: _name,
-            gender: _gender,
-            email: _email,
             healthID: _healthID,
+            email: _email,
             password: _password
         });
 
-        patients[_healthID] = newPatient;
         isPatientRegistered[_healthID] = true;
         emit PatientRegistered(_healthID, _name, _cryptoWalletAddress);
+    }
+
+    function registerPatientPersonalDetails( string memory _healthID, string memory _gender, uint256 _age, uint256 _date, uint256 _month, uint256 _year, bool _maritalStatus, string memory _disabilities ) public {
+        require(isPatientRegistered[_healthID], "Patient not registered");
+
+        patients[_healthID].personalDetails = PatientPersonalDetails({
+            gender: _gender,
+            age: _age,
+            date: _date,
+            month: _month,
+            year: _year,
+            maritalStatus: _maritalStatus,
+            disabilities: _disabilities
+        });
+    }
+
+    function registerPatientMedicalDetails( string memory _healthID, uint256 _weight, uint256 _feet, uint256 _inches, string memory _allergies, bool _isDiabetic, bool _isHypertension ) public {
+        require(isPatientRegistered[_healthID], "Patient not registered");
+
+        patients[_healthID].medicalDetails = PatientMedicalDetails({
+            weight: _weight,
+            feet: _feet,
+            inches: _inches,
+            allergies: _allergies,
+            isDiabetic: _isDiabetic,
+            isHypertension: _isHypertension
+        });
+    }
+
+    function registerPatientLifestyleDetails( string memory _healthID, string memory _smokingStatus, string memory _alcoholConsumption, string memory _exerciseHabit ) public {
+        require(isPatientRegistered[_healthID], "Patient not registered");
+
+        patients[_healthID].lifestyleDetails = PatientLifestyleDetails({
+            smokingStatus: _smokingStatus,
+            alcoholConsumption: _alcoholConsumption,
+            exerciseHabit: _exerciseHabit
+        });
+    }
+
+    function registerPatientPolicyDetails( string memory _healthID, string memory _insuranceProvider, uint256 _policyNumber ) public {
+        require(isPatientRegistered[_healthID], "Patient not registered");
+
+        patients[_healthID].policyDetails = PatientPolicyDetails({
+            insuranceProvider: _insuranceProvider,
+            policyNumber: _policyNumber
+        });
     }
 
     function isRegisteredPatient(string memory _healthID) public view returns (bool) {
@@ -54,52 +118,73 @@ contract PatientRegistration {
 
     function validatePassword(string memory _healthID, string memory _password) public view returns (bool) {
         require(isPatientRegistered[_healthID], "Patient not registered");
-        return keccak256(abi.encodePacked(_password)) == keccak256(abi.encodePacked(patients[_healthID].password));
+        return keccak256(abi.encodePacked(_password)) == keccak256(abi.encodePacked(patients[_healthID].credential.password));
     }
 
-    function getPatientDetails(string memory _healthID) public view returns (
-        address cryptoWalletAddress,
-        string memory name,
-        string memory gender,
-        string memory email
-    ) {
+    function getPatientCredentials(string memory _healthID) public view returns ( address cryptoWalletAddress, string memory name, string memory healthID, string memory email ) {
         require(isPatientRegistered[_healthID], "Patient not registered");
-        Patient memory patient = patients[_healthID];
-        return (patient.cryptoWalletAddress, patient.name, patient.gender, patient.email);
+
+        Patient storage patient = patients[_healthID];
+
+        return (
+            patient.credential.cryptoWalletAddress,
+            patient.credential.name,
+            patient.credential.healthID,
+            patient.credential.email
+        );
     }
 
-    function grantPermission(
-        string memory _patientNumber,
-        string memory _doctorNumber,
-        string memory _patientName
-    ) public {
-        require(!doctorPermissions[_patientNumber][_doctorNumber], "View Access already given to the Doctor!");
+    function getPatientPersonalDetails(string memory _healthID) public view returns ( string memory gender, uint256 age, uint256 date, uint256 month, uint256 year, bool maritalStatus, string memory disabilities ) {
+        require(isPatientRegistered[_healthID], "Patient not registered");
 
-        // Track the patient for the doctor
-        uint256 patientCount = doctorPatientCount[_doctorNumber];
-        Dpermission[_doctorNumber][patientCount] = PatientList({
-            patient_number: _patientNumber,
-            patient_name: _patientName
-        });
-        doctorPatientCount[_doctorNumber]++;
+        Patient storage patient = patients[_healthID];
 
-        doctorPermissions[_patientNumber][_doctorNumber] = true;
+        return (
+            patient.personalDetails.gender,
+            patient.personalDetails.age,
+            patient.personalDetails.date,
+            patient.personalDetails.month,
+            patient.personalDetails.year,
+            patient.personalDetails.maritalStatus,
+            patient.personalDetails.disabilities
+        );
     }
 
-    function isPermissionGranted(string memory _patientNumber, string memory _doctorNumber) public view returns (bool) {
-        return doctorPermissions[_patientNumber][_doctorNumber];
+    function getPatientMedicalDetails(string memory _healthID) public view returns ( uint256 weight, uint256 feet, uint256 inches, string memory allergies, bool isDiabetic, bool isHypertension ) {
+        require(isPatientRegistered[_healthID], "Patient not registered");
+
+        Patient storage patient = patients[_healthID];
+
+        return (
+            patient.medicalDetails.weight,
+            patient.medicalDetails.feet,
+            patient.medicalDetails.inches,
+            patient.medicalDetails.allergies,
+            patient.medicalDetails.isDiabetic,
+            patient.medicalDetails.isHypertension
+        );
     }
 
-    function getPatientList(string memory _doctorNumber) public view returns (string memory, string memory) {
-        uint256 patientCount = doctorPatientCount[_doctorNumber];
-        
-        // Return a single patient or return just the first entry to avoid complexity
-        if (patientCount > 0) {
-            PatientList memory patient = Dpermission[_doctorNumber][0];  // Change index as needed
-            return (patient.patient_number, patient.patient_name);
-        }
-        
-        // If no patient, return an empty string
-        return ("", "");
+    function getPatientLifestyleDetails(string memory _healthID) public view returns ( string memory smokingStatus, string memory alcoholConsumption, string memory exerciseHabit ) {
+        require(isPatientRegistered[_healthID], "Patient not registered");
+
+        Patient storage patient = patients[_healthID];
+
+        return (
+            patient.lifestyleDetails.smokingStatus,
+            patient.lifestyleDetails.alcoholConsumption,
+            patient.lifestyleDetails.exerciseHabit
+        );
+    }
+
+    function getPatientPolicyDetails(string memory _healthID) public view returns ( string memory insuranceProvider, uint256 policyNumber ) {
+        require(isPatientRegistered[_healthID], "Patient not registered");
+
+        Patient storage patient = patients[_healthID];
+
+        return (
+            patient.policyDetails.insuranceProvider,
+            patient.policyDetails.policyNumber
+        );
     }
 }

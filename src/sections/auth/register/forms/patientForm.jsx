@@ -7,7 +7,6 @@ function PatientForm() {
     const [patientData, setPatientData] = useState({
         cryptoWalletAddress: '',
         fullName: '',
-        gender: '',
         healthId: '',
         email: '',
         password: '',
@@ -40,38 +39,42 @@ function PatientForm() {
                 PatientRegistration.abi,
                 PatientRegistration.networks[networkId].address
             );
-            console.log("Contract initialized with address:", DispensaryRegistration.networks[networkId].address);
+            console.log("Contract initialized with address:", PatientRegistration.networks[networkId].address);
             
             console.log("Checking if patient is already registered...");
             const isRegPatient = await contract.methods
                 .isRegisteredPatient(patientData.healthId)
                 .call();
-            console.log("Is Registered Patient:", isRegPatient);
-    
-            if (isRegPatient) {
-                alert("Patient already exists");
-                console.log("Patient already exists, aborting registration");
-                return;
-            }
-    
-            console.log("Registering patient with the following details:", patientData);
-    
-            await contract.methods
-                .registerPatient(
-                    patientData.cryptoWalletAddress,
-                    patientData.fullName,
-                    patientData.gender,
-                    patientData.email,
+                console.log("Is Registered Patient:", isRegPatient);
+                
+                if (isRegPatient) {
+                    alert("Patient already exists");
+                    console.log("Patient already exists, aborting registration");
+                    return;
+                }
+                
+                console.log("Registering patient with the following details:", patientData);
+                
+                await contract.methods
+                .registerPatientCredentials(
                     patientData.healthId,
-                    patientData.password
+                    patientData.fullName,
+                    patientData.email,
+                    patientData.password,
+                    patientData.cryptoWalletAddress
                 )
                 .send({ from: patientData.cryptoWalletAddress });
-    
-            console.log("Patient registration successful");
-            navigate("/login");
-        } catch (error) {
-            console.error("Error:", error);
-            alert("An error occurred while registering the doctor.");
+                
+                console.log("Patient registration successful");
+                
+                const PatientData = await contract.methods
+                    .getPatientCredentials(patientData.healthId)
+                    .call();
+                console.log(PatientData.name);
+
+            } catch (error) {
+                console.error("Error:", error);
+                alert("An error occurred while registering the doctor.");
             console.log("Registration error:", error);
         }
     };
@@ -94,7 +97,7 @@ function PatientForm() {
                         value={patientData.cryptoWalletAddress}
                         onChange={handleInputChange}
                         placeholder="Crypto Wallet Address"
-                        className="w-full px-6 py-3 rounded-full bg-gray-100 border-0 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
+                        className="w-full px-6 py-3 rounded-full text-sm bg-white border border-[#e6eaf0] text-gray-900 placeholder-gray-500 focus:ring-1 focus:ring-gray-700 focus:outline-none"
                     />
                 </div>
             
@@ -105,11 +108,11 @@ function PatientForm() {
                         value={patientData.fullName}
                         onChange={handleInputChange}
                         placeholder="Full Name"
-                        className="w-full px-6 py-3 rounded-full bg-gray-100 border-0 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
+                        className="w-full px-6 py-3 rounded-full text-sm bg-white border border-[#e6eaf0] text-gray-900 placeholder-gray-500 focus:ring-1 focus:ring-gray-700 focus:outline-none"
                     />
                 </div>
             
-                <div className="relative">
+                {/* <div className="relative">
                     <div onClick={toggleGenderDropdown} className="w-full px-6 py-3 rounded-full bg-gray-100 border-0 text-gray-900 focus:ring-2 focus:ring-gray-200 focus:outline-none cursor-pointer">
                         <span> {selectedGender || 'Select Gender'} </span>
                         <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500"> &#9660; </span>
@@ -130,7 +133,7 @@ function PatientForm() {
                             </div>
                         </div>
                     )}
-                </div>
+                </div> */}
             
                 <div>
                     <input
@@ -139,7 +142,7 @@ function PatientForm() {
                         value={patientData.healthId}
                         onChange={handleInputChange}
                         placeholder="National Health ID (ABHA ID)"
-                        className="w-full px-6 py-3 rounded-full bg-gray-100 border-0 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
+                        className="w-full px-6 py-3 rounded-full text-sm bg-white border border-[#e6eaf0] text-gray-900 placeholder-gray-500 focus:ring-1 focus:ring-gray-700 focus:outline-none"
                     />
                 </div>
             
@@ -150,7 +153,7 @@ function PatientForm() {
                         value={patientData.email}
                         onChange={handleInputChange}
                         placeholder="Email address"
-                        className="w-full px-6 py-3 rounded-full bg-gray-100 border-0 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
+                        className="w-full px-6 py-3 rounded-full text-sm bg-white border border-[#e6eaf0] text-gray-900 placeholder-gray-500 focus:ring-1 focus:ring-gray-700 focus:outline-none"
                     />
                 </div>
             
@@ -161,12 +164,12 @@ function PatientForm() {
                         value={patientData.password}
                         onChange={handleInputChange}
                         placeholder="Create password"
-                        className="w-full px-6 py-3 rounded-full bg-gray-100 border-0 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
+                        className="w-full px-6 py-3 rounded-full text-sm bg-white border border-[#e6eaf0] text-gray-900 placeholder-gray-500 focus:ring-1 focus:ring-gray-700 focus:outline-none"
                     />
                 </div>
 
                 <div>
-                    <button type="submit" className="w-full mt-5 bg-gray-900 text-white px-4 py-3 rounded-full font-albulaBold hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 transition-all ease-in-out duration-200" >
+                    <button type="submit" className="w-full mt-5 bg-[#1a3235] text-white px-4 py-3 rounded-full font-albulaBold hover:bg-[#2d555b] focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 transition-all ease-in-out duration-200" >
                         <div className="flex items-center justify-center">
                             <span> Register </span>
                             <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

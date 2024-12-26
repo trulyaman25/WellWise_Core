@@ -7,9 +7,6 @@ function DoctorForm() {
     const [doctorData, setDoctorData] = useState({
         cryptoWalletAddress: '',
         fullName: '',
-        gender: '',
-        hospitalName: '',
-        specialization: '',
         licenseNumber: '',
         email: '',
         password: '',
@@ -104,9 +101,6 @@ function DoctorForm() {
             await contract.methods
                 .registerDoctor(
                     doctorData.fullName,
-                    doctorData.gender,
-                    doctorData.hospitalName,
-                    doctorData.specialization,
                     doctorData.licenseNumber,
                     doctorData.email,
                     doctorData.password
@@ -139,7 +133,7 @@ function DoctorForm() {
                         value={doctorData.cryptoWalletAddress}
                         onChange={handleInputChange}
                         placeholder="Crypto Wallet Address"
-                        className="w-full px-6 py-3 rounded-full bg-gray-100 border-0 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
+                        className="w-full px-6 py-3 rounded-full text-sm bg-white border border-[#e6eaf0] text-gray-900 placeholder-gray-500 focus:ring-1 focus:ring-gray-700 focus:outline-none"
                     />
                 </div>
 
@@ -150,11 +144,11 @@ function DoctorForm() {
                         value={doctorData.fullName}
                         onChange={handleInputChange}
                         placeholder="Full Name"
-                        className="w-full px-6 py-3 rounded-full bg-gray-100 border-0 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
+                        className="w-full px-6 py-3 rounded-full text-sm bg-white border border-[#e6eaf0] text-gray-900 placeholder-gray-500 focus:ring-1 focus:ring-gray-700 focus:outline-none"
                     />
                 </div>
 
-                <div className="relative">
+                {/* <div className="relative">
                     <div onClick={toggleGenderDropdown} className="w-full px-6 py-3 rounded-full bg-gray-100 border-0 text-gray-900 focus:ring-2 focus:ring-gray-200 focus:outline-none cursor-pointer">
                         <span> {selectedGender || 'Select Gender'} </span>
                         <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500"> &#9660; </span>
@@ -175,9 +169,9 @@ function DoctorForm() {
                             </div>
                         </div>
                     )}
-                </div>
+                </div> */}
 
-                <div>
+                {/* <div>
                     <input
                         type="text"
                         name="hospitalName"
@@ -186,9 +180,9 @@ function DoctorForm() {
                         placeholder="Hospital Name"
                         className="w-full px-6 py-3 rounded-full bg-gray-100 border-0 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
                     />
-                </div>
+                </div> */}
 
-                <div className="relative">
+                {/* <div className="relative">
                     <div onClick={toggleSpecializationDropdown} className="w-full px-6 py-3 rounded-full bg-gray-100 border-0 text-gray-900 focus:ring-2 focus:ring-gray-200 focus:outline-none cursor-pointer">
                         <span> {selectedSpecialization || 'Select Specialization'} </span>
                         <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500"> &#9660; </span>
@@ -213,7 +207,7 @@ function DoctorForm() {
                             </div>
                         </div>
                     )}
-                </div>
+                </div> */}
 
                 <div>
                     <input
@@ -222,7 +216,7 @@ function DoctorForm() {
                         value={doctorData.licenseNumber}
                         onChange={handleInputChange}
                         placeholder="Medical License Number"
-                        className="w-full px-6 py-3 rounded-full bg-gray-100 border-0 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
+                        className="w-full px-6 py-3 rounded-full text-sm bg-white border border-[#e6eaf0] text-gray-900 placeholder-gray-500 focus:ring-1 focus:ring-gray-700 focus:outline-none"
                     />
                 </div>
 
@@ -233,7 +227,7 @@ function DoctorForm() {
                         value={doctorData.email}
                         onChange={handleInputChange}
                         placeholder="Email address"
-                        className="w-full px-6 py-3 rounded-full bg-gray-100 border-0 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
+                        className="w-full px-6 py-3 rounded-full text-sm bg-white border border-[#e6eaf0] text-gray-900 placeholder-gray-500 focus:ring-1 focus:ring-gray-700 focus:outline-none"
                     />
                 </div>
 
@@ -244,7 +238,7 @@ function DoctorForm() {
                         value={doctorData.password}
                         onChange={handleInputChange}
                         placeholder="Create password"
-                        className="w-full px-6 py-3 rounded-full bg-gray-100 border-0 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
+                        className="w-full px-6 py-3 rounded-full text-sm bg-white border border-[#e6eaf0] text-gray-900 placeholder-gray-500 focus:ring-1 focus:ring-gray-700 focus:outline-none"
                     />
                 </div>
 

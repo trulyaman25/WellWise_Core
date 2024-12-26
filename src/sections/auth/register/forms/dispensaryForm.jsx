@@ -7,7 +7,6 @@ function DispensaryForm () {
     const [dispensaryData, setDispensaryData] = useState({
         cryptoWalletAddress: '',
         dispensaryName: '',
-        hospitalName: '',
         licenseNumber: '',
         email: '',
         password: '',
@@ -82,7 +81,6 @@ function DispensaryForm () {
             await contract.methods
                 .registerDiagnostic(
                     dispensaryData.dispensaryName,
-                    dispensaryData.hospitalName,
                     dispensaryData.licenseNumber,
                     dispensaryData.email,
                     dispensaryData.password
@@ -116,7 +114,7 @@ function DispensaryForm () {
                         value={dispensaryData.cryptoWalletAddress}
                         onChange={handleInputChange}
                         placeholder="Crypto Wallet Address"
-                        className="w-full px-6 py-3 rounded-full bg-gray-100 border-0 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
+                        className="w-full px-6 py-3 rounded-full text-sm bg-white border border-[#e6eaf0] text-gray-900 placeholder-gray-500 focus:ring-1 focus:ring-gray-700 focus:outline-none"
                     />
                 </div>
 
@@ -127,11 +125,11 @@ function DispensaryForm () {
                         value={dispensaryData.dispensaryName}
                         onChange={handleInputChange}
                         placeholder="Dispensary Name"
-                        className="w-full px-6 py-3 rounded-full bg-gray-100 border-0 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
+                        className="w-full px-6 py-3 rounded-full text-sm bg-white border border-[#e6eaf0] text-gray-900 placeholder-gray-500 focus:ring-1 focus:ring-gray-700 focus:outline-none"
                     />
                 </div>
 
-                <div>
+                {/* <div>
                     <input
                         type="text"
                         name="hospitalName"
@@ -140,7 +138,7 @@ function DispensaryForm () {
                         placeholder="Hospital Name"
                         className="w-full px-6 py-3 rounded-full bg-gray-100 border-0 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
                     />
-                </div>
+                </div> */}
 
                 <div>
                     <input
@@ -149,7 +147,7 @@ function DispensaryForm () {
                         value={dispensaryData.licenseNumber}
                         onChange={handleInputChange}
                         placeholder="Business License Number"
-                        className="w-full px-6 py-3 rounded-full bg-gray-100 border-0 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
+                        className="w-full px-6 py-3 rounded-full text-sm bg-white border border-[#e6eaf0] text-gray-900 placeholder-gray-500 focus:ring-1 focus:ring-gray-700 focus:outline-none"
                     />
                 </div>
 
@@ -160,7 +158,7 @@ function DispensaryForm () {
                         value={dispensaryData.email}
                         onChange={handleInputChange}
                         placeholder="Email address"
-                        className="w-full px-6 py-3 rounded-full bg-gray-100 border-0 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
+                        className="w-full px-6 py-3 rounded-full text-sm bg-white border border-[#e6eaf0] text-gray-900 placeholder-gray-500 focus:ring-1 focus:ring-gray-700 focus:outline-none"
                     />
                 </div>
 
@@ -171,7 +169,7 @@ function DispensaryForm () {
                         value={dispensaryData.password}
                         onChange={handleInputChange}
                         placeholder="Create password"
-                        className="w-full px-6 py-3 rounded-full bg-gray-100 border-0 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-gray-200 focus:outline-none"
+                        className="w-full px-6 py-3 rounded-full text-sm bg-white border border-[#e6eaf0] text-gray-900 placeholder-gray-500 focus:ring-1 focus:ring-gray-700 focus:outline-none"
                     />
                 </div>
 

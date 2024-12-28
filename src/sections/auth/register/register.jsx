@@ -5,9 +5,9 @@ import PatientForm from './initialRegistrationForms/patientForm';
 import DoctorForm from './initialRegistrationForms/doctorForm';
 import DispensaryForm from './initialRegistrationForms/dispensaryForm';
 
-import PatientProfileBuilderForm from './profileBuilderForms/patientForm';
-import DoctorProfileBuilderForm from './profileBuilderForms/doctorForm';
-import DispensaryProfileBuilderForm from './profileBuilderForms/dispensaryForm';
+import PatientProfileBuilderForm from './profileBuilderForms/patientProfileBuilderForm';
+import DoctorProfileBuilderForm from './profileBuilderForms/doctorProfileBuilderForm';
+import DispensaryProfileBuilderForm from './profileBuilderForms/dispensaryProfileBuilderForm';
 
 import MosiacIllustration from '/illustration/mosiacPattern.png';
 import WellWiseLogo from '/favicon.png';
@@ -74,7 +74,7 @@ function Register() {
     
     return (
         <div className="h-screen w-screen bg-[#e6eaf0] sm:p-8 lg:py-8 flex items-center justify-center">
-            <div className='w-fit h-full bg-white flex p-8 sm:p-14 lg:w-[1335px] sm:rounded-[30px] sm:drop-shadow-lg'>
+            <div className={`w-fit bg-white flex ${!patientInitialRegistration && !doctorInitialRegistration && !dispensaryInitialRegistration && 'lg:w-[1335px]'} p-8 sm:p-14 sm:rounded-[30px] sm:drop-shadow-lg`}>
                 {!patientInitialRegistration && !doctorInitialRegistration && !dispensaryInitialRegistration && <InitialRegistration userType={userType} setUserType={setUserType} setPatientInitialRegistration={setPatientInitialRegistration} setDoctorInitialRegistration={setDoctorInitialRegistration} setDispensaryInitialRegistration={setDispensaryInitialRegistration}/>}
                 
                 {patientInitialRegistration && <PatientProfileBuilderForm />}

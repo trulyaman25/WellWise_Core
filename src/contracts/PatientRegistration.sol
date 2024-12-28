@@ -20,6 +20,15 @@ contract PatientRegistration {
         string disabilities;
     }
 
+    struct PatientContactDetails {
+        uint256 contactNumber;
+        string appartmentNumber;
+        string street;
+        string city;
+        string state;
+        string country;
+    }
+
     struct PatientMedicalDetails {
         uint256 weight;
         uint256 feet;
@@ -43,6 +52,7 @@ contract PatientRegistration {
     struct Patient {
         PatientCredentials credential;
         PatientPersonalDetails personalDetails;
+        PatientContactDetails contactDetails;
         PatientMedicalDetails medicalDetails;
         PatientLifestyleDetails lifestyleDetails;
         PatientPolicyDetails policyDetails;
@@ -77,6 +87,19 @@ contract PatientRegistration {
             year: _year,
             maritalStatus: _maritalStatus,
             disabilities: _disabilities
+        });
+    }
+
+    function registerPatientContactDetails( string memory _healthId, uint256 _contactNumber, string memory _appartmentNumber, string memory _street, string memory _city, string memory _state, string memory _country ) public {
+        require(isPatientRegistered[_healthId], "Patient not registered");
+
+        patients[_healthId].contactDetails = PatientContactDetails({
+            contactNumber: _contactNumber,
+            appartmentNumber: _appartmentNumber,
+            street: _street,
+            city: _city,
+            state: _state,
+            country: _country
         });
     }
 
@@ -147,6 +170,21 @@ contract PatientRegistration {
             patient.personalDetails.year,
             patient.personalDetails.maritalStatus,
             patient.personalDetails.disabilities
+        );
+    }
+
+    function getPatientContactDetails(string memory _healthId) public view returns ( uint256 contactNumber, string memory appartmentNumber, string memory street, string memory city, string memory state, string memory country ) {
+        require(isPatientRegistered[_healthId], "Patient not registered");
+
+        Patient storage patient = patients[_healthId];
+
+        return (
+            patient.contactDetails.contactNumber,
+            patient.contactDetails.appartmentNumber,
+            patient.contactDetails.street,
+            patient.contactDetails.city,
+            patient.contactDetails.state,
+            patient.contactDetails.country
         );
     }
 

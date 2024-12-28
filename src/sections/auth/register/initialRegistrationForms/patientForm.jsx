@@ -26,7 +26,7 @@ function PatientForm({setInitialRegistration}) {
     
     const [web3, setWeb3] = useState(null);
     const [contract, setContract] = useState(null);
-
+    
     const [connectedAccount, setConnectedAccount] = useState("");
 
     useEffect(() => {
@@ -56,6 +56,8 @@ function PatientForm({setInitialRegistration}) {
                         );
                         setContract(contractInstance);
                         console.log("Patient Smart contract loaded successfully.");
+                        navigate(`?healthId=631879620036`, { replace: true });
+                        setInitialRegistration(true);
                     } else {
                         console.error("Patient Smart contract not deployed on the detected network.");
                     }
@@ -113,7 +115,7 @@ function PatientForm({setInitialRegistration}) {
                 setInitialRegistration(true);
             } catch (error) {
                 console.error("Error:", error);
-                alert("An error occurred while registering the doctor.");
+                alert("An error occurred while registering the Patient.");
             console.log("Registration error:", error);
         }
     };

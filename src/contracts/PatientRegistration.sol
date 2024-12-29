@@ -16,7 +16,7 @@ contract PatientRegistration {
         uint256 date;
         uint256 month;
         uint256 year;
-        bool maritalStatus;
+        string maritalStatus;
         string disabilities;
     }
 
@@ -76,7 +76,7 @@ contract PatientRegistration {
         emit PatientRegistered(_healthID, _name, _cryptoWalletAddress);
     }
 
-    function registerPatientPersonalDetails( string memory _healthID, string memory _gender, uint256 _age, uint256 _date, uint256 _month, uint256 _year, bool _maritalStatus, string memory _disabilities ) public {
+    function registerPatientPersonalDetails( string memory _healthID, string memory _gender, uint256 _age, uint256 _date, uint256 _month, uint256 _year, string memory _maritalStatus, string memory _disabilities ) public {
         require(isPatientRegistered[_healthID], "Patient not registered");
 
         patients[_healthID].personalDetails = PatientPersonalDetails({
@@ -157,7 +157,7 @@ contract PatientRegistration {
         );
     }
 
-    function getPatientPersonalDetails(string memory _healthID) public view returns ( string memory gender, uint256 age, uint256 date, uint256 month, uint256 year, bool maritalStatus, string memory disabilities ) {
+    function getPatientPersonalDetails(string memory _healthID) public view returns ( string memory gender, uint256 age, uint256 date, uint256 month, uint256 year, string memory maritalStatus, string memory disabilities ) {
         require(isPatientRegistered[_healthID], "Patient not registered");
 
         Patient storage patient = patients[_healthID];

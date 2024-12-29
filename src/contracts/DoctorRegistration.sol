@@ -12,15 +12,15 @@ contract DoctorRegistration {
 
     struct DoctorPersonalDetails {
         string gender;
-        uint256 age;
-        uint256 date;
-        uint256 month;
-        uint256 year;
-        bool maritalStatus;
+        string age;
+        string date;
+        string month;
+        string year;
+        string maritalStatus;
     }
 
     struct DoctorContactDetails {
-        uint256 contactNumber;
+        string contactNumber;
         string appartmentNumber;
         string street;
         string city;
@@ -31,16 +31,16 @@ contract DoctorRegistration {
     struct DoctorEducationalDetails {
         string specialization;
         string heighestQualification;
-        uint256 experience;
+        string experience;
         string medicalSchool;
-        uint256 graduationYear;
+        string graduationYear;
     }
 
     struct DoctorProfessionalDetails {
         string hospitalName;
         string designation;
         string department;
-        uint256 consultantFees;
+        string consultantFees;
     }
 
     struct Doctor {
@@ -77,11 +77,11 @@ contract DoctorRegistration {
     function registerDoctorPersonalDetails(
         string memory _licenseNumber,
         string memory _gender,
-        uint256 _age,
-        uint256 _date,
-        uint256 _month,
-        uint256 _year,
-        bool _maritalStatus
+        string memory _age,
+        string memory _date,
+        string memory _month,
+        string memory _year,
+        string memory _maritalStatus
     ) public {
         require(doctorAddresses[_licenseNumber] != address(0), "Doctor not found");
         doctors[_licenseNumber].personalDetails = DoctorPersonalDetails({
@@ -96,7 +96,7 @@ contract DoctorRegistration {
 
     function registerDoctorContactDetails(
         string memory _licenseNumber,
-        uint256 _contactNumber,
+        string memory _contactNumber,
         string memory _appartmentNumber,
         string memory _street,
         string memory _city,
@@ -118,9 +118,9 @@ contract DoctorRegistration {
         string memory _licenseNumber,
         string memory _specialization,
         string memory _highestQualification,
-        uint256 _experience,
+        string memory _experience,
         string memory _medicalSchool,
-        uint256 _graduationYear
+        string memory _graduationYear
     ) public {
         require(doctorAddresses[_licenseNumber] != address(0), "Doctor not found");
         doctors[_licenseNumber].educationalDetails = DoctorEducationalDetails({
@@ -137,7 +137,7 @@ contract DoctorRegistration {
         string memory _hospitalName,
         string memory _designation,
         string memory _department,
-        uint256 _consultantFees
+        string memory _consultantFees
     ) public {
         require(doctorAddresses[_licenseNumber] != address(0), "Doctor not found");
         doctors[_licenseNumber].professionalDetails = DoctorProfessionalDetails({
@@ -171,7 +171,7 @@ contract DoctorRegistration {
         );
     }
 
-    function getDoctorPersonalDetails(string memory _licenseNumber) public view returns ( string memory gender, uint256 age, uint256 date, uint256 month, uint256 year, bool maritalStatus ) {
+    function getDoctorPersonalDetails(string memory _licenseNumber) public view returns ( string memory gender, string memory age, string memory date, string memory month, string memory year, string memory maritalStatus ) {
         require(doctorAddresses[_licenseNumber] != address(0), "Doctor not registered");
 
         Doctor storage doctor = doctors[_licenseNumber];
@@ -186,7 +186,7 @@ contract DoctorRegistration {
         );
     }
 
-    function getDoctorContactDetails(string memory _licenseNumber) public view returns ( uint256 contactNumber, string memory appartmentNumber, string memory street, string memory city, string memory state, string memory country ) {
+    function getDoctorContactDetails(string memory _licenseNumber) public view returns ( string memory contactNumber, string memory appartmentNumber, string memory street, string memory city, string memory state, string memory country ) {
         require(doctorAddresses[_licenseNumber] != address(0), "Doctor not registered");
 
         Doctor storage doctor = doctors[_licenseNumber];
@@ -201,7 +201,7 @@ contract DoctorRegistration {
         );
     }
 
-    function getDoctorEducationalDetails(string memory _licenseNumber) public view returns ( string memory specialization, string memory highestQualification, uint256 experience, string memory medicalSchool, uint256 graduationYear ) {
+    function getDoctorEducationalDetails(string memory _licenseNumber) public view returns ( string memory specialization, string memory highestQualification, string memory experience, string memory medicalSchool, string memory graduationYear ) {
         require(doctorAddresses[_licenseNumber] != address(0), "Doctor not registered");
 
         Doctor storage doctor = doctors[_licenseNumber];
@@ -215,7 +215,7 @@ contract DoctorRegistration {
         );
     }
 
-    function getDoctorProfessionalDetails(string memory _licenseNumber) public view returns ( string memory hospitalName, string memory designation, string memory department, uint256 consultantFees ) {
+    function getDoctorProfessionalDetails(string memory _licenseNumber) public view returns ( string memory hospitalName, string memory designation, string memory department, string memory consultantFees ) {
         require(doctorAddresses[_licenseNumber] != address(0), "Doctor not registered");
 
         Doctor storage doctor = doctors[_licenseNumber];

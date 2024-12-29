@@ -1,6 +1,9 @@
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import Home from './sections/home/home';
 import Register from './sections/auth/register/register';
+import PatientProfileBuilder from "./sections/auth/register/profileBuilder/patientProfileBuilder/patientProfile";
+import DoctorProfileBuilder from "./sections/auth/register/profileBuilder/doctorProfileBuilder/doctorProfile";
+import DispensaryProfileBuilder from './sections/auth/register/profileBuilder/dispensaryProfileBuilder/doctorProfile';
 import Login from "./sections/auth/login/login";
 import Header from "./sections/navigation/header/header";
 import Footer from "./sections/navigation/footer/footer";
@@ -25,11 +28,14 @@ function RouteWithHeaderFooter() {
 
 			<Routes>
 				<Route path='/' element={<Home />} />
-				<Route path="/register" element={<Register />} />
 				<Route path="/login" element={<Login />} />
+				<Route path="/register" element={<Register />} />
+				<Route path="/register/patient/profile/:uniqueID" element={<PatientProfileBuilder />}/>
+				<Route path="/register/doctor/profile/:licenseNumber" element={<DoctorProfileBuilder />}/>
+				<Route path="/register/dispensary/profile/:licenceNumber" element={<DispensaryProfileBuilder />}/>
 				<Route path="/patient/:healthID" element={<PatientDashboard />} />
-				<Route path="/doctor/:medicalLicenceNumber" element={<DoctorDashboard />} />
-				<Route path="/dispensary/:businessLicenceNumber" element={<DispensaryDashboard />} />
+				<Route path="/doctor/:licenseNumber" element={<DoctorDashboard />} />
+				<Route path="/dispensary/:licenseNumber" element={<DispensaryDashboard />} />
 			</Routes>
 
 			{location.pathname === '/' && <Footer />}

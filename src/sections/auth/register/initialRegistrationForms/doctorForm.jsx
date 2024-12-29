@@ -118,7 +118,7 @@ function DoctorForm({setInitialRegistration}) {
                 .send({ from: connectedAccount });
     
             console.log("Doctor registration successful");
-            navigate(`?licenseNumber=${doctorData.licenseNumber}`, { replace: true });
+            navigate(`/register/doctor/profile/${doctorData.licenseNumber}`, { replace: true });
             setInitialRegistration(true);
         } catch (error) {
             console.error("Error during doctor registration:", error);
@@ -233,7 +233,7 @@ function DoctorForm({setInitialRegistration}) {
 
                 <div>
                     <input
-                        type="email"
+                        // type="email"
                         name="email"
                         value={doctorData.email}
                         onChange={handleInputChange}

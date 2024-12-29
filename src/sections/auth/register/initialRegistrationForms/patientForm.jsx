@@ -56,7 +56,6 @@ function PatientForm({setInitialRegistration}) {
                         );
                         setContract(contractInstance);
                         console.log("Patient Smart contract loaded successfully.");
-                        navigate(`?healthId=631879620036`, { replace: true });
                         setInitialRegistration(true);
                     } else {
                         console.error("Patient Smart contract not deployed on the detected network.");
@@ -111,7 +110,7 @@ function PatientForm({setInitialRegistration}) {
                     .send({ from: connectedAccount });
                 
                 console.log("Patient registration successful");
-                navigate(`?healthId=${patientData.healthId}`, { replace: true });
+                navigate(`/register/patient/profile/${patientData.healthId}`, { replace: true });
                 setInitialRegistration(true);
             } catch (error) {
                 console.error("Error:", error);

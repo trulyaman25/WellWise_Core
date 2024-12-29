@@ -51,7 +51,7 @@ function DoctorDashboard() {
 
                         setDoctorDetails({
                             credentials: {
-                                walletAddress: String(doctorCredentials[0]), // Making sure walletAddress is string
+                                walletAddress: String(doctorCredentials[0]),
                                 name: String(doctorCredentials[1]),
                                 licenseNumber: String(doctorCredentials[2]),
                                 email: String(doctorCredentials[3]),

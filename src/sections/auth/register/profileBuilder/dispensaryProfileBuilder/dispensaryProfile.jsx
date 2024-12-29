@@ -1,28 +1,18 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import DoctorRegistration from '../../../../../build/contracts/DoctorRegistration.json';
+import DispensaryRegistration from '../../../../../build/contracts/DispensaryRegistration.json';
 import Web3 from 'web3';
 import WellWiseLogo from '/favicon.png';
 
-import PersonalDetails from '../doctorProfileBuilder/forms/personalDetailForm';
-import ContactDetails from '../doctorProfileBuilder/forms/contactDetailForm';
-import EducationDetails from '../doctorProfileBuilder/forms/educationDetailForm';
-import ProfessionalDetails from '../doctorProfileBuilder/forms/professionalDetailForm';
+import OwnerDetails from './forms/ownerDetails';
+import DispensaryDetails from './forms/dispensaryDetails';
 
 function Register() {
-    const [userType, setUserType] = useState('patient');
-    const [patientInitialRegistration, setPatientInitialRegistration] = useState(false);
-    const [doctorInitialRegistration, setDoctorInitialRegistration] = useState(false);
-    const [dispensaryInitialRegistration, setDispensaryInitialRegistration] = useState(false);
-
     const navigate = useNavigate();
 
-    const { uniqueID } = useParams();
+    const { licenseNumber } = useParams();
 
-    const licenceNumber = `${uniqueID}`;
-
-    const [Doctor, setDoctor] = useState(null);
-    const [error, setError] = useState("");
+    const [dispensary, setDispensary] = useState(null);
     const [connectedAccount, setConnectedAccount] = useState("");
     const [web3, setWeb3] = useState();
     const [contract, setContract] = useState();
@@ -39,31 +29,33 @@ function Register() {
                     setConnectedAccount(accounts[0]);
 
                     const networkId = await web3Instance.eth.net.getId();
-                    const deployedNetwork = DoctorRegistration.networks[networkId];
+                    const deployedNetwork = DispensaryRegistration.networks[networkId];
 
                     if (deployedNetwork) {
                         const contractInstance = new web3Instance.eth.Contract(
-                            DoctorRegistration.abi,
+                            DispensaryRegistration.abi,
                             deployedNetwork.address
                         );
                         setContract(contractInstance);
 
                         console.log("Doctor Smart contract loaded successfully.");
 
-                        const doctorCredentials = await contractInstance.methods
-                            .getDoctorCredentials(licenceNumber)
+                        const dispensaryCredentials = await contractInstance.methods
+                            .getDispensaryCredentials(licenseNumber)
                             .call();
 
+                            console.log(dispensaryCredentials);
+
                             const formattedDetails = {
-                                walletAddress: doctorCredentials[0],
-                                name: doctorCredentials[1],
-                                licenceNumber: doctorCredentials[2],
-                                email: doctorCredentials[3],
+                                dispensaryName: dispensaryCredentials[0],
+                                licenceNumber: dispensaryCredentials[1],
+                                email: dispensaryCredentials[2],
+                                walletAddress: dispensaryCredentials[3],
                             };
 
-                            setDoctor(formattedDetails);
+                            setDispensary(formattedDetails);
                     } else {
-                        console.error("Doctor Smart contract not deployed on the detected network.");
+                        console.error("Dispensary Smart contract not deployed on the detected network.");
                     }
                 } catch (error) {
                     console.error("Error accessing MetaMask or contract:", error);
@@ -77,16 +69,14 @@ function Register() {
         init();
     }, []);    
 
-    const [personalSubmit, setPersonalSubmit] = useState(false);
-    const [contactSubmit, setContactSubmit] = useState(false);
-    const [educationSubmit, seteducationSubmit] = useState(false);
-    const [professionalSubmit, setprofessionalSubmit] = useState(false);
+    const [ownerSubmit, setOwnerSubmit] = useState(false);
+    const [dispensarySubmit, setDispensarySubmit] = useState(false);
     
     return (
         <div className="h-screen w-screen bg-[#e6eaf0] sm:p-8 lg:py-8 flex items-center justify-center">
             <div className={`w-fit bg-white flex  p-8 sm:p-14 sm:rounded-[30px] sm:drop-shadow-lg`}>
                 <div className="p-4">
-                    {patient ? (
+                    {dispensary ? (
                         <div>
                             <section className="flex flex-col items-center">
                                 <div id="header" className="w-full flex justify-start">
@@ -96,7 +86,7 @@ function Register() {
                                             Welcome,
                                         </div>
                                         <div className="w-full text-3xl text-start font-albulaHeavy capitalize mt-1 text-[#24454a]">
-                                            {patient.name}
+                                            {dispensary.dispensaryName}
                                         </div>
                                     </div>
                                 </div>
@@ -104,27 +94,20 @@ function Register() {
                                 <div className="w-[600px] h-[2px] mt-5 bg-slate-300 rounded-full"></div>
                                 <div id="timeline" className="mt-8">
                                     <div className="w-[600px] flex justify-around items-center">
-                                        <div className="font-albulaRegular text-sm text-center"> Personal <br /> Details </div>
-                                        <div className="font-albulaRegular text-sm text-center"> Contact <br /> Details </div>
-                                        <div className="font-albulaRegular text-sm text-center"> Education <br /> Details </div>
-                                        <div className="font-albulaRegular text-sm text-center"> Professional <br /> Details </div>
+                                        <div className="w-[120px] font-albulaRegular text-sm text-center"> Owner <br /> Details </div>
+                                        <div className="w-[120px] font-albulaRegular text-sm text-center"> Dispensary <br /> Details </div>
                                     </div>
 
                                     <div className="w-[600px] h-[7px] mt-6 bg-slate-300 rounded-full relative flex justify-around items-center">
                                         <div className="w-[25px] h-[25px] flex justify-center items-center text-sm mb-2 font-albulaMedium rounded-full bg-white border-2 border-[#24452a]">1</div>
                                         <div className="w-[25px] h-[25px] flex justify-center items-center text-sm mb-2 font-albulaMedium rounded-full bg-white border-2 border-[#24452a]">2</div>
-                                        <div className="w-[25px] h-[25px] flex justify-center items-center text-sm mb-2 font-albulaMedium rounded-full bg-white border-2 border-[#24452a]">3</div>
-                                        <div className="w-[25px] h-[25px] flex justify-center items-center text-sm mb-2 font-albulaMedium rounded-full bg-white border-2 border-[#24452a]">4</div>
-                                        <div className="w-[25px] h-[25px] flex justify-center items-center text-sm mb-2 font-albulaMedium rounded-full bg-white border-2 border-[#24452a]">5</div>
                                     </div>
                                 </div>
                             </section>
 
                             <section className="mt-14">
-                                {!personalSubmit && !contactSubmit && !educationSubmit && !professionalSubmit && <PersonalDetails setPersonalSubmit={setPersonalSubmit}/>}
-                                {personalSubmit && !contactSubmit && !educationSubmit && !professionalSubmit && <ContactDetails setContactSubmit={setContactSubmit}/>}
-                                {personalSubmit && contactSubmit && !educationSubmit && !professionalSubmit && <EducationDetails setEducationSubmit={setEducationSubmit}/>}
-                                {personalSubmit && contactSubmit && educationSubmit && !professionalSubmit && <ProfessionalDetails setProfessionalSubmit={setProfessionalSubmit}/>}
+                                {!ownerSubmit && !dispensarySubmit && <OwnerDetails setOwnerSubmit={setOwnerSubmit} dispensary={dispensary}/>}
+                                {ownerSubmit && !dispensarySubmit && <DispensaryDetails setDispensarySubmit={setDispensarySubmit} dispensary={dispensary}/>}
                             </section>
                         </div>
                     ) : (

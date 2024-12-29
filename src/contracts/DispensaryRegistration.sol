@@ -12,14 +12,13 @@ contract DispensaryRegistration {
 
     struct dispensaryOwnerDetails {
         string ownerName;
-        string ownerEmail;
-        uint256 ownerPhoneNumber;
+        string ownerPhoneNumber;
         string ownerGender;
-        uint256 age;
+        string age;
     }
 
     struct dispensaryContactDetails {
-        uint256 contactNumber;
+        string contactNumber;
         string dispensaryWebsite;
         string operationalHours;
     }
@@ -35,7 +34,12 @@ contract DispensaryRegistration {
 
     event DiagnosticRegistered(string licenseNumber, string dispensaryName, address cryptoWalletAddress);
 
-    function registerDispensaryCredentials( string memory _name, string memory _licenseNumber, string memory _email, string memory _password ) public {
+    function registerDispensaryCredentials( 
+        string memory _name, 
+        string memory _licenseNumber, 
+        string memory _email, 
+        string memory _password 
+    ) public {
         dispensaries[_licenseNumber].credential = dispensaryCredentials({
             walletAddress: msg.sender,
             dispensaryName: _name,
@@ -48,18 +52,28 @@ contract DispensaryRegistration {
         emit DiagnosticRegistered(_licenseNumber, _name, msg.sender);
     }
 
-    function registerDispensaryOwnerDetails( string memory _licenseNumber, string memory _ownerName, string memory _ownerEmail, uint256 _ownerPhoneNumber, string memory _ownerGender, uint256 _age ) public {
+    function registerDispensaryOwnerDetails( 
+        string memory _licenseNumber, 
+        string memory _ownerName,
+        string memory _ownerPhoneNumber, 
+        string memory _ownerGender, 
+        string memory _age 
+    ) public {
         require(dispensaryAddresses[_licenseNumber] != address(0), "Dispensary not found");
         dispensaries[_licenseNumber].ownerDetails = dispensaryOwnerDetails({
             ownerName: _ownerName,
-            ownerEmail: _ownerEmail,
             ownerPhoneNumber: _ownerPhoneNumber,
             ownerGender: _ownerGender,
             age: _age
         });
     }
 
-    function registerDispensaryContactDetails( string memory _licenseNumber, uint256 _contactNumber, string memory _dispensaryWebsite, string memory _operationalHours ) public {
+    function registerDispensaryContactDetails( 
+        string memory _licenseNumber, 
+        string memory _contactNumber, 
+        string memory _dispensaryWebsite, 
+        string memory _operationalHours 
+    ) public {
         require(dispensaryAddresses[_licenseNumber] != address(0), "Dispensary not found");
         dispensaries[_licenseNumber].contactDetails = dispensaryContactDetails({
             contactNumber: _contactNumber,
@@ -68,7 +82,10 @@ contract DispensaryRegistration {
         });
     }
 
-    function validatePassword(string memory _licenseNumber, string memory _password) public view returns (bool) {
+    function validatePassword(
+        string memory _licenseNumber, 
+        string memory _password
+    ) public view returns (bool) {
         require(dispensaryAddresses[_licenseNumber] != address(0), "Dispensary not found");
         dispensaryCredentials memory credentials = dispensaries[_licenseNumber].credential;
         return (keccak256(abi.encodePacked(credentials.password)) == keccak256(abi.encodePacked(_password)));
@@ -89,19 +106,18 @@ contract DispensaryRegistration {
         );
     }
 
-    function getDispensaryOwnerDetails(string memory _licenseNumber) public view returns ( string memory ownerName, string memory ownerEmail, uint256 ownerPhoneNumber, string memory ownerGender, uint256 age ) {
+    function getDispensaryOwnerDetails(string memory _licenseNumber) public view returns ( string memory ownerName, string memory ownerPhoneNumber, string memory ownerGender, string memory age ) {
         require(dispensaryAddresses[_licenseNumber] != address(0), "Dispensary not found");
         dispensary storage d = dispensaries[_licenseNumber];
         return (
             d.ownerDetails.ownerName,
-            d.ownerDetails.ownerEmail,
             d.ownerDetails.ownerPhoneNumber,
             d.ownerDetails.ownerGender,
             d.ownerDetails.age
         );
     }
 
-    function getDispensaryContactDetails(string memory _licenseNumber) public view returns ( uint256 contactNumber, string memory dispensaryWebsite, string memory operationalHours ) {
+    function getDispensaryContactDetails(string memory _licenseNumber) public view returns ( string memory contactNumber, string memory dispensaryWebsite, string memory operationalHours ) {
         require(dispensaryAddresses[_licenseNumber] != address(0), "Dispensary not found");
         dispensary storage d = dispensaries[_licenseNumber];
         return (

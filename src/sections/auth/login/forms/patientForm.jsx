@@ -96,7 +96,7 @@ function PatientLogin({ setIsRegistered, setPatientDetails }) {
                     console.log("Patient details:", fetchPatientDetails);
                     console.log('Login successful');
                     console.log('Redirecting...')
-                    navigate("/patient/" + patientHealthID);
+                    navigate("/patient/" + patientHealthID + "/home");
                 } else {
                     alert("Incorrect password");
                     console.log("Password validation failed");

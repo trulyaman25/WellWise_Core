@@ -1,46 +1,56 @@
-import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
-import Home from './sections/home/home';
-import Register from './sections/auth/register/register';
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Home from "./sections/home/home";
+import Login from "./sections/auth/login/login";
+import Register from "./sections/auth/register/register";
 import PatientProfileBuilder from "./sections/auth/register/profileBuilder/patientProfileBuilder/patientProfile";
 import DoctorProfileBuilder from "./sections/auth/register/profileBuilder/doctorProfileBuilder/doctorProfile";
-import DispensaryProfileBuilder from './sections/auth/register/profileBuilder/dispensaryProfileBuilder/dispensaryProfile';
-import Login from "./sections/auth/login/login";
+import DispensaryProfileBuilder from "./sections/auth/register/profileBuilder/dispensaryProfileBuilder/dispensaryProfile";
+
+import PatientDashboardLayout from "./sections/dashboard/patientDashboard/patientDashboardLayout";
+import PatientHome from "./sections/dashboard/patientDashboard/pages/patientHome";
+import PatientAppointments from "./sections/dashboard/patientDashboard/pages/patientAppointment";
+import PatientMentalHealthDashboard from "./sections/dashboard/patientDashboard/pages/patientMentalDashboard";
+import PatientProfile from "./sections/dashboard/patientDashboard/pages/patientProfile";
+
+import DoctorDashboard from "./sections/dashboard/doctorDashboard/doctorDashboard";
+import DispensaryDashboard from "./sections/dashboard/dispensaryDashboard/dispensaryDashboard";
+
 import Header from "./sections/navigation/header/header";
 import Footer from "./sections/navigation/footer/footer";
-import PatientDashboard from './sections/dashboard/patientDashboard/patientDashboard';
-import DoctorDashboard from "./sections/dashboard/doctorDashboard/doctorDashboard";
-import DispensaryDashboard from './sections/dashboard/dispensaryDashboard/dispensaryDashboard';
 
-function RouteConfig() {
-	return (
-		<Router>
-			<RouteWithHeaderFooter />
-		</Router>
-	);
+function HomeRendering() {
+    return (
+        <>
+            <Header />
+            <Home />
+            <Footer />
+        </>
+    )
 }
 
-function RouteWithHeaderFooter() {
-	const location = useLocation();
+function AppRoutes() {
+    return (
+        <Router>
+            <Routes>
+                <Route path="/" element={<HomeRendering />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+                <Route path="/register/patient/profile/:uniqueID" element={<PatientProfileBuilder />} />
+                <Route path="/register/doctor/profile/:licenseNumber" element={<DoctorProfileBuilder />} />
+                <Route path="/register/dispensary/profile/:licenseNumber" element={<DispensaryProfileBuilder />} />
 
-	return (
-		<>
-			{location.pathname === '/' && <Header />}
+                <Route path="/patient/:healthID" element={<PatientDashboardLayout />}>
+                    <Route path='home' element={<PatientHome />} />
+                    <Route path='appointments' element={<PatientAppointments />} />
+                    <Route path='mentalhealth' element={<PatientMentalHealthDashboard />} />
+                    <Route path='profile' element={<PatientProfile />} />
+                </Route>
 
-			<Routes>
-				<Route path='/' element={<Home />} />
-				<Route path="/login" element={<Login />} />
-				<Route path="/register" element={<Register />} />
-				<Route path="/register/patient/profile/:uniqueID" element={<PatientProfileBuilder />}/>
-				<Route path="/register/doctor/profile/:licenseNumber" element={<DoctorProfileBuilder />}/>
-				<Route path="/register/dispensary/profile/:licenseNumber" element={<DispensaryProfileBuilder />}/>
-				<Route path="/patient/:healthID" element={<PatientDashboard />} />
-				<Route path="/doctor/:licenseNumber" element={<DoctorDashboard />} />
-				<Route path="/dispensary/:licenseNumber" element={<DispensaryDashboard />} />
-			</Routes>
-
-			{location.pathname === '/' && <Footer />}
-		</>
-	);
+                <Route path="/doctor/:licenseNumber" element={<DoctorDashboard />} />
+                <Route path="/dispensary/:licenseNumber" element={<DispensaryDashboard />} />
+            </Routes>
+        </Router>
+    );
 }
 
-export default RouteConfig;
+export default AppRoutes;

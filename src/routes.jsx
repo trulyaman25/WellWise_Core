@@ -9,7 +9,7 @@ import DispensaryProfileBuilder from "./sections/auth/register/profileBuilder/di
 import PatientDashboardLayout from "./sections/dashboard/patientDashboard/patientDashboardLayout";
 import PatientHome from "./sections/dashboard/patientDashboard/pages/patientHome";
 import PatientAppointments from "./sections/dashboard/patientDashboard/pages/patientAppointment";
-import PatientMentalHealthDashboard from "./sections/dashboard/patientDashboard/pages/patientMentalDashboard";
+import MentalHealthTest from "./sections/dashboard/patientDashboard/pages/mentalHealthTest/mhTest";
 import PatientProfile from "./sections/dashboard/patientDashboard/pages/patientProfile";
 
 import DoctorDashboard from "./sections/dashboard/doctorDashboard/doctorDashboard";
@@ -42,9 +42,10 @@ function AppRoutes() {
                 <Route path="/patient/:healthID" element={<PatientDashboardLayout />}>
                     <Route path='home' element={<PatientHome />} />
                     <Route path='appointments' element={<PatientAppointments />} />
-                    <Route path='mentalhealth' element={<PatientMentalHealthDashboard />} />
                     <Route path='profile' element={<PatientProfile />} />
                 </Route>
+
+                <Route path="/patient/:healthID/takeTest" element={<MentalHealthTest />}/>
 
                 <Route path="/doctor/:licenseNumber" element={<DoctorDashboard />} />
                 <Route path="/dispensary/:licenseNumber" element={<DispensaryDashboard />} />

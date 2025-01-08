@@ -129,9 +129,10 @@ function PatientDashboard() {
 
     return (
         <div className="fixed w-full h-screen p-10 font-albulaRegular">
-            <h1 className="text-black">
-                Patient Home
-            </h1>
+            <div className="text-black">
+                <span className='text-2xl font-albulaMedium'> Welcome </span>
+                <span className='text-2xl font-albulaHeavy italic'>{patientDetails.credentials.name}</span>
+            </div>
         </div>
     );
 }

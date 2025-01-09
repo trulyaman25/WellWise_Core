@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 
 import PatientRegistration from '../../../../../build/contracts/PatientRegistration.json';
+import MentalHealth from '../../../../../build/contracts/MentalHealth.json';
 import Web3 from 'web3';
 
 import WellWiseLogo from '/favicon.png';
@@ -83,13 +84,39 @@ function PatientMentalHealthDashboard() {
 
     const [session, setSession] = useState(false);
 
-    const handleAccept = () => {
-        setIsLoading(true);
-        setSession(true);
-        setTimeout(() => {
+    const initializeTest = async (e) => {
+        e.preventDefault();
+        try {
+            const web3 = new Web3(window.ethereum);
+            const networkId = await web3.eth.net.getId();
+            const contract = new web3.eth.Contract(
+                MentalHealth.abi,
+                MentalHealth.networks[networkId].address
+            );
+
+            await contract.methods
+                .initializePatientMHTest(
+                    patient.healthID,
+                    patient.healthID,
+                    patient.walletAddress
+                )
+                .send({ from: patient.walletAddress });
+
             setIsLoading(false);
             setShowDisclaimer(false);
-        }, 500);
+            console.log("Initialized MHT");
+        } catch (error) {
+            console.error("Error:", error);
+            alert("An error occurred while Initializing your MT.");
+            console.log("Initialization Error:", error);
+        }
+    };
+
+    const handleAccept = (e) => {
+        e.preventDefault();
+        setIsLoading(true);
+        setSession(true);
+        initializeTest(e);
     };
 
     const loaderOptions = {

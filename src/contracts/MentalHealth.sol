@@ -30,8 +30,10 @@ contract MentalHealth {
         string healthID;
         string testID;
         mhtChildhoodDetails mhtcd;
+        string mhtcdScore;
         mhtphq9SectionOne mhtphqOne;
         mhtphq9SectionTwo mhtphqTwo;
+        string phq9Score;
         string textSentiment;
         string audioHash;
     }
@@ -44,14 +46,16 @@ contract MentalHealth {
             testID: _testID,
             cryptoWalletAddress: _cryptoWalletAddress,
             mhtcd: mhtChildhoodDetails("", "", "", "", ""),
+            mhtcdScore: "",
             mhtphqOne: mhtphq9SectionOne("", "", "", "", ""),
             mhtphqTwo: mhtphq9SectionTwo("", "", "", ""),
+            phq9Score: "",
             textSentiment: "",
             audioHash: ""
         });
     }
 
-    function initializeChildhoodDetails( string memory _healthID, string memory _questionOne, string memory _questionTwo, string memory _questionThree, string memory _questionFour, string memory _questionFive ) public {
+    function initializeChildhoodDetails( string memory _healthID, string memory _questionOne, string memory _questionTwo, string memory _questionThree, string memory _questionFour, string memory _questionFive, string memory _score) public {
         mhtChildhoodDetails memory mhtcd = mhtChildhoodDetails({
             questionOne: _questionOne,
             questionTwo: _questionTwo,
@@ -61,6 +65,7 @@ contract MentalHealth {
         });
 
         patientTests[_healthID].mhtcd = mhtcd;
+        patientTests[_healthID].mhtcdScore = _score;
     }
 
     function initializePHQ9SectionOne( string memory _healthID, string memory _questionOne, string memory _questionTwo, string memory _questionThree, string memory _questionFour, string memory _questionFive ) public {
@@ -75,7 +80,7 @@ contract MentalHealth {
         patientTests[_healthID].mhtphqOne = mhtphqOne;
     }
 
-    function initializePHQ9SectionTwo( string memory _healthID, string memory _questionSix, string memory _questionSeven, string memory _questionEight, string memory _questionNine ) public {
+    function initializePHQ9SectionTwo( string memory _healthID, string memory _questionSix, string memory _questionSeven, string memory _questionEight, string memory _questionNine, string memory _score ) public {
         mhtphq9SectionTwo memory mhtphqTwo = mhtphq9SectionTwo({
             questionSix: _questionSix,
             questionSeven: _questionSeven,
@@ -84,6 +89,7 @@ contract MentalHealth {
         });
 
         patientTests[_healthID].mhtphqTwo = mhtphqTwo;
+        patientTests[_healthID].phq9Score = _score;
     }
 
     function initializeSentimentAnalysis(string memory _healthID, string memory _text, string memory _hash) public {
@@ -98,14 +104,16 @@ contract MentalHealth {
         );
     }
 
-    function getChildhoodDetails(string memory _healthID) public view returns ( string memory questionOne, string memory questionTwo, string memory questionThree, string memory questionFour, string memory questionFive ) {
+    function getChildhoodDetails(string memory _healthID) public view returns ( string memory questionOne, string memory questionTwo, string memory questionThree, string memory questionFour, string memory questionFive, string memory phq9Score ) {
         mhtChildhoodDetails memory mhtcd = patientTests[_healthID].mhtcd;
+        string memory mhtcdScore = patientTests[_healthID].mhtcdScore;
         return (
             mhtcd.questionOne,
             mhtcd.questionTwo,
             mhtcd.questionThree,
             mhtcd.questionFour,
-            mhtcd.questionFive
+            mhtcd.questionFive,
+            mhtcdScore
         );
     }
 
@@ -127,6 +135,13 @@ contract MentalHealth {
             mhtphqTwo.questionSeven,
             mhtphqTwo.questionEight,
             mhtphqTwo.questionNine
+        );
+    }
+
+    function getPHQ9Score(string memory _healthID) public view returns (string memory _score){
+        string memory score = patientTests[_healthID].phq9Score;
+        return (
+            score
         );
     }
 }

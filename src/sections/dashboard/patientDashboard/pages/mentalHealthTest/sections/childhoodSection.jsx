@@ -1,6 +1,42 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
-function ChildhoodSection({ step }) {
+import Web3 from "web3";
+import MentalHealth from '../../../../../../build/contracts/MentalHealth.json';
+
+function ChildhoodSection({ step, patientDetails }) {
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        // try {
+        //     const web3 = new Web3(window.ethereum);
+        //     const networkId = await web3.eth.net.getId();
+        //     const contract = new web3.eth.Contract(
+        //         MentalHealth.abi,
+        //         MentalHealth.networks[networkId].address
+        //     );
+
+        //     console.log(patientDetails.healthID);
+             
+        //     await contract.methods
+        //         .initializeChildhoodDetails(
+        //             patientDetails.healthID,
+        //             answers.question1,
+        //             answers.question2,
+        //             answers.question3,
+        //             answers.question4,
+        //             answers.question5,
+        //         )
+        //         .send({ from: patientDetails.walletAddress });
+                
+        //     console.log("Childhood & Past Experiences Submitted Successfully");
+            console.log("Total Score:", totalScore / 15.0);
+            step(2);
+        // } catch (error) {
+        //     console.error("Error:", error);
+        //     alert("An error occurred while storing Childhood & Past Experiences.");
+        //     console.log("Storing Error error:", error);
+        // }
+    };
+
     const questions = [
         "Q1) During your childhood, did you experience any significant events that caused you prolonged stress or fear? (e.g., loss of a loved one, parental separation, or exposure to violence)",
         "Q2) Were there times when you felt unsupported or unsafe in your home environment as a child? (e.g., emotional neglect, lack of affection, or unstable living conditions)",
@@ -11,34 +47,36 @@ function ChildhoodSection({ step }) {
 
     const [currentQuestion, setCurrentQuestion] = useState(0);
     const [answers, setAnswers] = useState({});
-    const [selectedAnswer, setSelectedAnswer] = useState("");
+    const [selectedAnswer, setSelectedAnswer] = useState('');
+    const [totalScore, setTotalScore] = useState(0);
 
     const handleAnswerChange = (value) => {
+        const oldScore = answers[`question${currentQuestion + 1}`] === "Yes" ? 2 :
+                         answers[`question${currentQuestion + 1}`] === "Not Sure" ? 1 : 0;
+        const newScore = value === "Yes" ? 2 : value === "Not Sure" ? 1 : 0;
+    
         setSelectedAnswer(value);
         setAnswers((prevAnswers) => ({
             ...prevAnswers,
-            [currentQuestion]: value,
+            [`question${currentQuestion + 1}`]: value
         }));
+        setTotalScore((prevScore) => prevScore - oldScore + newScore);
     };
 
     const handleNext = () => {
         if (currentQuestion < questions.length - 1) {
-            setCurrentQuestion(currentQuestion + 1);
-            setSelectedAnswer(answers[currentQuestion + 1] || "");
+            const nextQuestion = currentQuestion + 1;
+            setCurrentQuestion(nextQuestion);
+            setSelectedAnswer(answers[`question${nextQuestion + 1}`] || '');
         }
     };
-
+    
     const handleBack = () => {
         if (currentQuestion > 0) {
-            setCurrentQuestion(currentQuestion - 1);
-            setSelectedAnswer(answers[currentQuestion - 1] || "");
+            const prevQuestion = currentQuestion - 1;
+            setCurrentQuestion(prevQuestion);
+            setSelectedAnswer(answers[`question${prevQuestion + 1}`] || '');
         }
-    };
-
-    const handleSubmit = () => {
-        console.log("Submitted Answers:", answers);
-        step(2);
-        alert("Your responses have been submitted successfully!");
     };
 
     const progress = ((currentQuestion + 1) / questions.length) * 100;
@@ -60,7 +98,15 @@ function ChildhoodSection({ step }) {
                     <div className="space-y-4">
                         {['Yes', 'No', 'Not Sure'].map((option) => (
                             <div key={option} className="flex items-center">
-                                <input type="radio" id={option} name="answer" value={option} checked={selectedAnswer === option} onChange={() => handleAnswerChange(option)} className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-[#266666] focus:ring-2" />
+                                <input 
+                                    type="radio" 
+                                    id={option} 
+                                    name="answer" 
+                                    value={option} 
+                                    checked={selectedAnswer === option} 
+                                    onChange={() => handleAnswerChange(option)} 
+                                    className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-[#266666] focus:ring-2" 
+                                />
                                 <label htmlFor={option} className="ml-2 font-albulaRegular text-gray-700">
                                     {option}
                                 </label>

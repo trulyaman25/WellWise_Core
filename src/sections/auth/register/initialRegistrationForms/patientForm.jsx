@@ -13,20 +13,9 @@ function PatientForm({setInitialRegistration}) {
     });
 
     const navigate = useNavigate();
-
-    const [isGenderDropdownOpen, setIsGenderDropdownOpen] = useState(false);
-    const [selectedGender, setSelectedGender] = useState('');
-    
-    const toggleGenderDropdown = () => setIsGenderDropdownOpen(!isGenderDropdownOpen);
-    const handleSelectGender = (value) => {
-        setSelectedGender(value);
-        patientData.gender = value;
-        setIsGenderDropdownOpen(false);
-    };
     
     const [web3, setWeb3] = useState(null);
     const [contract, setContract] = useState(null);
-    
     const [connectedAccount, setConnectedAccount] = useState("");
 
     useEffect(() => {
@@ -45,6 +34,7 @@ function PatientForm({setInitialRegistration}) {
 
                     const accounts = await web3Instance.eth.getAccounts();
                     setConnectedAccount(accounts[0]);
+                    console.log(connectedAccount);
 
                     const networkId = await web3Instance.eth.net.getId();
                     const deployedNetwork = PatientRegistration.networks[networkId];
@@ -130,7 +120,7 @@ function PatientForm({setInitialRegistration}) {
     return (
         <>
             <form onSubmit={handlePatientSubmit} className="space-y-4">
-                {/* <div>
+                <div>
                     <input
                         type="text"
                         name="cryptoWalletAddress"
@@ -140,7 +130,7 @@ function PatientForm({setInitialRegistration}) {
                         disabled
                         className="w-full px-6 py-3 text-center rounded-full text-sm bg-gray-200 border border-[#e6eaf0] text-gray-500 placeholder-gray-500 focus:ring-1 focus:ring-gray-700 focus:outline-none cursor-not-allowed"
                     />
-                </div> */}
+                </div>
             
                 <div>
                     <input
@@ -152,29 +142,6 @@ function PatientForm({setInitialRegistration}) {
                         className="w-full px-6 py-3 rounded-full text-sm bg-white border border-[#e6eaf0] text-gray-900 placeholder-gray-500 focus:ring-1 focus:ring-gray-700 focus:outline-none"
                     />
                 </div>
-            
-                {/* <div className="relative">
-                    <div onClick={toggleGenderDropdown} className="w-full px-6 py-3 rounded-full bg-gray-100 border-0 text-gray-900 focus:ring-2 focus:ring-gray-200 focus:outline-none cursor-pointer">
-                        <span> {selectedGender || 'Select Gender'} </span>
-                        <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500"> &#9660; </span>
-                    </div>
-            
-                    {isGenderDropdownOpen && (
-                        <div className="absolute w-full mt-2 bg-white border border-gray-200 rounded-3xl shadow-md z-10">
-                            <div onClick={() => handleSelectGender('male')} className="px-6 py-3 text-gray-900 cursor-pointer hover:bg-gray-200 hover:rounded-tl-3xl hover:rounded-tr-3xl">
-                                Male
-                            </div>
-            
-                            <div onClick={() => handleSelectGender('female')} className="px-6 py-3 text-gray-900 cursor-pointer hover:bg-gray-200">
-                                Female
-                            </div>
-            
-                            <div onClick={() => handleSelectGender('other')} className="px-6 py-3 text-gray-900 cursor-pointer hover:bg-gray-200 hover:rounded-bl-3xl hover:rounded-br-3xl">
-                                Other
-                            </div>
-                        </div>
-                    )}
-                </div> */}
             
                 <div>
                     <input

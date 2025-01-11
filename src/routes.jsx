@@ -17,6 +17,7 @@ import DispensaryDashboard from "./sections/dashboard/dispensaryDashboard/dispen
 
 import Header from "./sections/navigation/header/header";
 import Footer from "./sections/navigation/footer/footer";
+import TestDashboard from "./sections/dashboard/patientDashboard/pages/mentalHealthTest/testDashboard";
 
 function HomeRendering() {
     return (
@@ -43,6 +44,7 @@ function AppRoutes() {
                     <Route path='home' element={<PatientHome />} />
                     <Route path='appointments' element={<PatientAppointments />} />
                     <Route path='profile' element={<PatientProfile />} />
+                    <Route path="mht/:testID" element={<TestDashboard />}/>
                 </Route>
 
                 <Route path="/patient/:healthID/takeTest" element={<MentalHealthTest />}/>

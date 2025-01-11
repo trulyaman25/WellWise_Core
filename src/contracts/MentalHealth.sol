@@ -1,147 +1,144 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.5.16;
+pragma experimental ABIEncoderV2;
 
 contract MentalHealth {
+    struct PatientCredentials {
+        address cryptoWalletAddress;
+        string healthID;
+        string testID;
+    }
+
     struct mhtChildhoodDetails {
         string questionOne;
         string questionTwo;
         string questionThree;
         string questionFour;
         string questionFive;
+        string score;
     }
 
-    struct mhtphq9SectionOne {
+    struct mhtPHQ9Details {
         string questionOne;
         string questionTwo;
         string questionThree;
         string questionFour;
         string questionFive;
-    }
-
-    struct mhtphq9SectionTwo {
         string questionSix;
         string questionSeven;
         string questionEight;
         string questionNine;
+        string score;
+    }
+
+    struct SentimentDetails {
+        string textSentiment;
+        string audioHash;
+        string score;
+    }
+
+    struct VideoAnalysis {
+        string blinkCount;
     }
 
     struct PatientMHTest {
-        address cryptoWalletAddress;
-        string healthID;
-        string testID;
+        PatientCredentials credentials;
         mhtChildhoodDetails mhtcd;
-        string mhtcdScore;
-        mhtphq9SectionOne mhtphqOne;
-        mhtphq9SectionTwo mhtphqTwo;
-        string phq9Score;
-        string textSentiment;
-        string audioHash;
+        mhtPHQ9Details mhtphqDetails;
+        SentimentDetails sentimentDetails;
+        VideoAnalysis videoDetails;
     }
 
-    mapping(string => PatientMHTest) private patientTests;
+    mapping(string => string[]) private healthIDToTestIDs;
+    mapping(string => PatientMHTest) private testIDToPatientTest;
 
     function initializePatientMHTest( string memory _healthID, string memory _testID, address _cryptoWalletAddress ) public {
-        patientTests[_healthID] = PatientMHTest({
-            healthID: _healthID,
-            testID: _testID,
-            cryptoWalletAddress: _cryptoWalletAddress,
-            mhtcd: mhtChildhoodDetails("", "", "", "", ""),
-            mhtcdScore: "",
-            mhtphqOne: mhtphq9SectionOne("", "", "", "", ""),
-            mhtphqTwo: mhtphq9SectionTwo("", "", "", ""),
-            phq9Score: "",
-            textSentiment: "",
-            audioHash: ""
+        require(bytes(testIDToPatientTest[_testID].credentials.testID).length == 0, "TestID already exists");
+
+        healthIDToTestIDs[_healthID].push(_testID);
+
+        testIDToPatientTest[_testID] = PatientMHTest({
+            credentials: PatientCredentials({
+                healthID: _healthID,
+                testID: _testID,
+                cryptoWalletAddress: _cryptoWalletAddress
+            }),
+            mhtcd: mhtChildhoodDetails("", "", "", "", "", ""),
+            mhtphqDetails: mhtPHQ9Details("", "", "", "", "", "", "", "", "", ""),
+            sentimentDetails: SentimentDetails("", "", ""),
+            videoDetails: VideoAnalysis("")
         });
     }
 
-    function initializeChildhoodDetails( string memory _healthID, string memory _questionOne, string memory _questionTwo, string memory _questionThree, string memory _questionFour, string memory _questionFive, string memory _score) public {
+    function initializeChildhoodDetails( string memory _testID, string memory _questionOne, string memory _questionTwo, string memory _questionThree, string memory _questionFour, string memory _questionFive, string memory _score ) public {
         mhtChildhoodDetails memory mhtcd = mhtChildhoodDetails({
             questionOne: _questionOne,
             questionTwo: _questionTwo,
             questionThree: _questionThree,
             questionFour: _questionFour,
-            questionFive: _questionFive
+            questionFive: _questionFive,
+            score: _score
         });
 
-        patientTests[_healthID].mhtcd = mhtcd;
-        patientTests[_healthID].mhtcdScore = _score;
+        testIDToPatientTest[_testID].mhtcd = mhtcd;
     }
 
-    function initializePHQ9SectionOne( string memory _healthID, string memory _questionOne, string memory _questionTwo, string memory _questionThree, string memory _questionFour, string memory _questionFive ) public {
-        mhtphq9SectionOne memory mhtphqOne = mhtphq9SectionOne({
+    function initializePHQ9Details( string memory _testID, string memory _questionOne, string memory _questionTwo, string memory _questionThree, string memory _questionFour, string memory _questionFive, string memory _questionSix, string memory _questionSeven, string memory _questionEight, string memory _questionNine, string memory _score ) public {
+        mhtPHQ9Details memory mhtphqDetails = mhtPHQ9Details({
             questionOne: _questionOne,
             questionTwo: _questionTwo,
             questionThree: _questionThree,
             questionFour: _questionFour,
-            questionFive: _questionFive
-        });
-
-        patientTests[_healthID].mhtphqOne = mhtphqOne;
-    }
-
-    function initializePHQ9SectionTwo( string memory _healthID, string memory _questionSix, string memory _questionSeven, string memory _questionEight, string memory _questionNine, string memory _score ) public {
-        mhtphq9SectionTwo memory mhtphqTwo = mhtphq9SectionTwo({
+            questionFive: _questionFive,
             questionSix: _questionSix,
             questionSeven: _questionSeven,
             questionEight: _questionEight,
-            questionNine: _questionNine
+            questionNine: _questionNine,
+            score: _score
         });
 
-        patientTests[_healthID].mhtphqTwo = mhtphqTwo;
-        patientTests[_healthID].phq9Score = _score;
+        testIDToPatientTest[_testID].mhtphqDetails = mhtphqDetails;
     }
 
-    function initializeSentimentAnalysis(string memory _healthID, string memory _text, string memory _hash) public {
-        patientTests[_healthID].textSentiment = _text;
-        patientTests[_healthID].audioHash = _hash;
+    function initializeSentimentDetails( string memory _testID, string memory _text, string memory _hash ) public {
+        SentimentDetails memory sentimentDetails = SentimentDetails({
+            textSentiment: _text,
+            audioHash: _hash,
+            score: ""
+        });
+
+        testIDToPatientTest[_testID].sentimentDetails = sentimentDetails;
     }
 
-    function getSentimentAnalysis(string memory _healthID) public view returns ( string memory text, string memory audioHash){
-        return(
-            patientTests[_healthID].textSentiment,
-            patientTests[_healthID].audioHash
-        );
+    function initializeSentimentalScore( string memory _testID, string memory _score) public {
+        string memory prevText = testIDToPatientTest[_testID].sentimentDetails.textSentiment;
+        string memory prevHash = testIDToPatientTest[_testID].sentimentDetails.audioHash;
+        SentimentDetails memory sentimentDetails = SentimentDetails({
+            textSentiment: prevText,
+            audioHash: prevHash,
+            score: _score
+        });
+        
+        testIDToPatientTest[_testID].sentimentDetails = sentimentDetails;
     }
 
-    function getChildhoodDetails(string memory _healthID) public view returns ( string memory questionOne, string memory questionTwo, string memory questionThree, string memory questionFour, string memory questionFive, string memory phq9Score ) {
-        mhtChildhoodDetails memory mhtcd = patientTests[_healthID].mhtcd;
-        string memory mhtcdScore = patientTests[_healthID].mhtcdScore;
-        return (
-            mhtcd.questionOne,
-            mhtcd.questionTwo,
-            mhtcd.questionThree,
-            mhtcd.questionFour,
-            mhtcd.questionFive,
-            mhtcdScore
-        );
+    function getAllTestIDs(string memory _healthID) public view returns (string[] memory) {
+        return healthIDToTestIDs[_healthID];
     }
 
-    function getPHQ9SectionOne(string memory _healthID) public view returns ( string memory questionOne, string memory questionTwo, string memory questionThree, string memory questionFour, string memory questionFive ) {
-        mhtphq9SectionOne memory mhtphqOne = patientTests[_healthID].mhtphqOne;
-        return (
-            mhtphqOne.questionOne,
-            mhtphqOne.questionTwo,
-            mhtphqOne.questionThree,
-            mhtphqOne.questionFour,
-            mhtphqOne.questionFive
-        );
+    function getChildhoodDetails(string memory _testID) public view returns (mhtChildhoodDetails memory) {
+        return testIDToPatientTest[_testID].mhtcd;
     }
 
-    function getPHQ9SectionTwo(string memory _healthID) public view returns ( string memory questionSix, string memory questionSeven, string memory questionEight, string memory questionNine ) {
-        mhtphq9SectionTwo memory mhtphqTwo = patientTests[_healthID].mhtphqTwo;
-        return (
-            mhtphqTwo.questionSix,
-            mhtphqTwo.questionSeven,
-            mhtphqTwo.questionEight,
-            mhtphqTwo.questionNine
-        );
+    function getPHQ9Details(string memory _testID) public view returns (mhtPHQ9Details memory) {
+        return testIDToPatientTest[_testID].mhtphqDetails;
     }
 
-    function getPHQ9Score(string memory _healthID) public view returns (string memory _score){
-        string memory score = patientTests[_healthID].phq9Score;
-        return (
-            score
-        );
+    function getSentimentDetails(string memory _testID) public view returns (SentimentDetails memory) {
+        return testIDToPatientTest[_testID].sentimentDetails;
+    }
+
+    function getCompleteTestDetails(string memory _testID) public view returns (PatientMHTest memory) {
+        return testIDToPatientTest[_testID];
     }
 }

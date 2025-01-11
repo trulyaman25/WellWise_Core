@@ -84,6 +84,17 @@ function PatientMentalHealthDashboard() {
 
     const [session, setSession] = useState(false);
 
+    const [testID, setTestID] = useState("");
+
+    const generateUniqueTestID = (healthID) => {
+        if (!healthID) return "";
+        return `${healthID}-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
+    };
+    
+    useEffect(() => {
+        setTestID(generateUniqueTestID(healthID));
+    }, [healthID]);
+
     const initializeTest = async (e) => {
         e.preventDefault();
         try {
@@ -94,10 +105,12 @@ function PatientMentalHealthDashboard() {
                 MentalHealth.networks[networkId].address
             );
 
+            console.log(testID);
+
             await contract.methods
                 .initializePatientMHTest(
                     patient.healthID,
-                    patient.healthID,
+                    testID,
                     patient.walletAddress
                 )
                 .send({ from: patient.walletAddress });
@@ -132,7 +145,7 @@ function PatientMentalHealthDashboard() {
         { id: 1, title: "Childhood & Past Experiences", description: "Explore past trauma and experiences." },
         { id: 2, title: "PHQ-9 Questionnaire", description: "Evaluate depression levels with PHQ-9." },
         { id: 3, title: "Sentiment Analysis", description: "Analyze sentiment from text and audio." },
-        { id: 4, title: "Facial Behavior Analysis", description: "Analyze facial expressions for mental health." }
+        { id: 4, title: "Facial Behavior Analysis", description: "Analyze facial expressions for detection." }
     ];    
 
     if (isLoading) {
@@ -152,59 +165,58 @@ function PatientMentalHealthDashboard() {
     return (
         <>
             <div className="w-screen h-screen bg-[#e6eaf0] flex justify-center items-center">
-                <div className="bg-white w-fit p-8 sm:p-14 sm:rounded-[30px] flex flex-row justify-center items-center sm:drop-shadow-lg">
-                    <div id="progressTracker" className="w-fit h-[800px] flex flex-col">
+                <div className="bg-white w-full h-full flex flex-row justify-between">
+                    <div id="progressTracker" className="w-[700px] h-full p-10 flex flex-col justify-between border-r-2">
                         <div className='flex flex-row justify-center items-center gap-7 scale-75 sm:scale-100'>
                             <img src={WellWiseLogo} alt="Well Wise Logo" className='w-[100px] h-[100px]'/>
-                            <div className='text-3xl text-[#24454a] font-albulaHeavy'>Well Wise</div>
+                            <div className='text-3xl text-[#24454a] font-albulaHeavy flex flex-col justify-center items-center'>
+                                <div>Well Wise</div>
+                                <div className="font-albulaLight text-sm">DETECT, PREVENT & CURE</div>
+                            </div>
                         </div>
 
-                        <div className="mt-12">
-                            {steps.map((step, index) => (
-                                <div key={step.id} className={`relative flex items-center py-5 px-8 rounded-3xl ${currentStep === step.id ? "bg-[#eef8f7]" : "" } cursor-pointer`}>
-                                    {index < steps.length - 1 && ( <div className={`absolute left-[50px] top-[63px] w-[3px] h-[50px] z-10 ${currentStep >= step.id ? "bg-[#266666]" : "bg-gray-300" }`} ></div> )}
-                                    
-                                    <div className={`w-10 h-10 rounded-full flex items-center justify-center text-black border-[3px] font-mono ${currentStep === step.id ? "border-[#266666] bg-white" : ""} ${currentStep > step.id ? "bg-[#266666]" : "bg-transparent"}`} >
-                                        {currentStep > step.id ? (
-                                            <span className="material-icons text-sm"></span>
-                                        ) : (
-                                            step.id
-                                        )}
-                                    </div>
+                            <div className="mt-12">
+                                {steps.map((step, index) => (
+                                    <div key={step.id} className={`relative flex items-center py-5 px-8 rounded-3xl ${currentStep === step.id ? "bg-[#eef8f7]" : "" } cursor-pointer`}>
+                                        {index < steps.length - 1 && ( <div className={`absolute left-[50px] top-[63px] w-[3px] h-[50px] z-10 ${currentStep >= step.id ? "bg-[#266666]" : "bg-gray-300" }`} ></div> )}
+                                        
+                                        <div className={`w-10 h-10 rounded-full flex items-center justify-center text-black border-[3px] font-mono ${currentStep === step.id ? "border-[#266666] bg-white" : ""} ${currentStep > step.id ? "bg-[#266666]" : "bg-transparent"}`} >
+                                            {currentStep > step.id ? (
+                                                <span className="material-icons text-sm"></span>
+                                            ) : (
+                                                step.id
+                                            )}
+                                        </div>
 
-                                    <div className="ml-6">
-                                        <h3 className={`text-lg font-albulaSemiBold ${ currentStep >= step.id ? "text-[#266666]" : "text-gray-500" }`} >
-                                            {step.title}
-                                        </h3>
-                                        <p className={`text-sm font-albulaRegular ${ currentStep >= step.id ? "text-[#609c9c]" : "text-gray-500" }`}>{step.description}</p>
+                                        <div className="ml-6">
+                                            <h3 className={`text-lg font-albulaSemiBold ${ currentStep >= step.id ? "text-[#266666]" : "text-gray-500" }`} >
+                                                {step.title}
+                                            </h3>
+                                            <p className={`text-sm font-albulaRegular ${ currentStep >= step.id ? "text-[#609c9c]" : "text-gray-500" }`}>{step.description}</p>
+                                        </div>
                                     </div>
+                                ))}
+                            </div>
+
+                            <div className="w-full flex flex-row justify-center items-center">
+                                <div className="w-[450px] rounded-3xl">
+                                    <VideoFeed session={session}/>
                                 </div>
-                            ))}
-                        </div>
-
-                        <div className="w-full flex flex-row justify-center items-center">
-                            <div className="w-[400px] rounded-3xl">
-                                <VideoFeed session={session}/>
                             </div>
                         </div>
 
                         {currentStep === 4 && (
-                        <>
-                            <div>
-                                <button onClick={() => setSession(false)}>FINISH TEST</button>
-                            </div>
-                        </>
-                    )}
-                    </div>
+                            <>
+                                <div>
+                                    <button onClick={() => setSession(false)}>FINISH TEST</button>
+                                </div>
+                            </>
+                        )}
 
-                    {currentStep !== 4 && (
-                        <div className="w-[2px] rounded-full bg-gray-300 mx-6 h-[600px]" />
-                    )}
-
-                    <div className="w-fit h-fit">
-                        {currentStep === 1 && <ChildhoodSection step={setCurrentStep} patientDetails={patient}/>}
-                        {currentStep === 2 && <PHQ9Section step={setCurrentStep} patientDetails={patient}/>}
-                        {currentStep === 3 && <SentimentAnalysis step={setCurrentStep} patientDetails={patient}/>}
+                    <div className="h-full w-full">
+                        {currentStep === 1 && <ChildhoodSection step={setCurrentStep} patientDetails={patient} tID={testID} />}
+                        {currentStep === 2 && <PHQ9Section step={setCurrentStep} patientDetails={patient} tID={testID}/>}
+                        {currentStep === 3 && <SentimentAnalysis step={setCurrentStep} patientDetails={patient} tID={testID}/>}
                     </div>
                 </div>
             </div>
